@@ -1,0 +1,12 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config SHIELD_LPM_VIEW
+    def_bool $(shields_list_contains,lpm_view)
+
+menuconfig LPM009M360A
+		bool "LPM009M360A display driver"
+		default n
+		select SPI
+		help 
+		 Enable driver for LPM009M360A display
