@@ -1,0 +1,91 @@
+# Copyright (c) 2025 ZitaoTech
+# SPDX-License-Identifier: MIT
+
+CONFIG_SOC_SERIES_NRF52X=y
+CONFIG_SOC_NRF52840_QIAA=y
+CONFIG_BOARD_SOFLE_DONGLE=y
+
+
+# Enable MPU
+CONFIG_ARM_MPU=y
+
+CONFIG_PINCTRL=y
+
+# enable GPIO
+CONFIG_GPIO=y
+
+# Build Configuration
+CONFIG_USE_DT_CODE_PARTITION=y
+CONFIG_BUILD_OUTPUT_UF2=y
+
+# Flash configuration
+CONFIG_MPU_ALLOW_FLASH_WRITE=y
+CONFIG_NVS=y
+CONFIG_SETTINGS_NVS=y
+CONFIG_FLASH=y
+CONFIG_FLASH_PAGE_LAYOUT=y
+CONFIG_FLASH_MAP=y
+
+# Enable Signal Power Plus
+CONFIG_BT_CTLR_TX_PWR_PLUS_8=y
+
+# Sleep Setting
+CONFIG_ZMK_SLEEP=n
+CONFIG_ZMK_EXT_POWER=y
+# timeout for backlight for keyboard in miliseconds
+CONFIG_ZMK_IDLE_TIMEOUT=600000                         
+
+
+# 5 profiles (n+2)
+CONFIG_BT_MAX_CONN=7
+CONFIG_BT_MAX_PAIRED=7
+
+# Keyboard backlight Setting
+# enable keyboard backlight
+CONFIG_ZMK_BACKLIGHT=y                           
+# set the brightness the keyboard backlight when powered on in 1-100
+CONFIG_ZMK_BACKLIGHT_BRT_START=40                     
+# set the brightness step for each change of backlight brightness
+CONFIG_ZMK_BACKLIGHT_BRT_STEP=10                      
+# enable keyboard backlight on when powered on
+CONFIG_ZMK_BACKLIGHT_ON_START=y                       
+# enable automatic turn off when no keypress detected
+CONFIG_ZMK_BACKLIGHT_AUTO_OFF_IDLE=y                  
+
+# HID indicator configuration
+CONFIG_ZMK_HID_INDICATORS=y
+
+                
+# Enable Mouse
+CONFIG_ZMK_POINTING=y
+CONFIG_INPUT=y
+CONFIG_ZMK_MOUSE=y
+CONFIG_ZMK_POINTING=y
+
+# Debuncing Setting 
+CONFIG_ZMK_KSCAN_DEBOUNCE_PRESS_MS=10
+CONFIG_ZMK_KSCAN_DEBOUNCE_RELEASE_MS=10
+
+# Enable both USB and BLE
+CONFIG_ZMK_USB=y
+CONFIG_ZMK_BLE=y
+
+# Milliseconds to wait after a setting change before writing it to flash memory
+CONFIG_ZMK_SETTINGS_SAVE_DEBOUNCE=1000
+
+# Enable EC11 Setting
+CONFIG_EC11=y
+CONFIG_EC11_TRIGGER_GLOBAL_THREAD=y
+
+# ZMK Studio
+CONFIG_ZMK_STUDIO=y
+CONFIG_ZMK_STUDIO_LOCKING=n
+CONFIG_ZMK_STUDIO_LOCK_ON_DISCONNECT=n
+
+# Log via USB or Segger RTT
+CONFIG_ZMK_USB_LOGGING=n
+CONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=4000
+
+
+
+
