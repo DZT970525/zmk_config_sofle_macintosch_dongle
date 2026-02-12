@@ -1,0 +1,98 @@
+/*
+*
+* Copyright (c) 2025 ZitaoTech
+* SPDX-License-Identifier: MIT
+*
+*/
+
+/ {
+    chosen {
+        zmk,custom_led = &custom_led;
+    };
+    custom_led: pwmledto{
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm1 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pwm1_default>;
+    pinctrl-1 = <&pwm1_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+&i2c0 {
+    status = "okay";
+    compatible = "nordic,nrf-twim";
+    clock-frequency = <I2C_BITRATE_FAST>; 
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    trackpoint:trackpoint@15 {
+        compatible = "zmk,trackpoint";
+        reg = <0x15>;
+        status = "okay";
+    };
+};
+
+/ {
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        /* BB Trackball */
+        trackpoint_split: trackpoint_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+
+    };
+
+    /* Listeners */
+    trackpoint_listener: trackpoint_listener {
+        compatible = "zmk,input-listener";
+        status = "disabled";
+        device = <&trackpoint_split>;
+    };
+
+};
+
+
+&trackpoint_split {
+    device = <&trackpoint>;
+};
+
+&pinctrl {
+        i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 7)>,
+                <NRF_PSEL(TWIM_SCL, 1, 8)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 7)>,
+                <NRF_PSEL(TWIM_SCL, 1, 8)>;
+            low-power-enable;
+        };
+    };
+    pwm1_default: pwm1_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 4)>; // Custom led
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 4)>;
+            bias-pull-down;
+        };
+    };
+};
+

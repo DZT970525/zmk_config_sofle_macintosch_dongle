@@ -1,0 +1,8 @@
+file_format: "1"
+id: right_trackpoint_dongle
+name: right_trackpoint_dongle
+type: shield
+url:
+requires:
+features:
+  - mouse

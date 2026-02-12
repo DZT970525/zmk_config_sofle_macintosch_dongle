@@ -1,0 +1,12 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config SHIELD_RIGHT_TRACKPOINT_DONGLE
+    def_bool $(shields_list_contains,right_trackpoint_dongle)
+
+config TRACKPOINT_EXPONENTIAL
+    bool "Enable TrackPoint exponential acceleration"
+    default n
+    help
+      Enable exponential acceleration for TrackPoint movement,
+      similar to trackball behavior.
