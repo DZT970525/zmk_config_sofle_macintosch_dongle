@@ -1,0 +1,20 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config SHIELD_LEFT_BBTRACKBALL_DONGLE
+    def_bool $(shields_list_contains,left_bbtrackball_dongle)
+
+menu "BBtrackball Setting"
+
+
+config BBtrackball_lighted_when_moved
+	bool "BBtrackball led lighted when moved"
+
+config BBtrackball_max_brightness
+    int "BBtrackball brightness when moved"
+    default 20
+    range 0 100
+    help
+      The brightness when you move the BB trackball
+      
+endmenu

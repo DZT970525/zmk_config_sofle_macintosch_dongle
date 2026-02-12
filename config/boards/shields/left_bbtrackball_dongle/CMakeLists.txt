@@ -1,0 +1,6 @@
+zephyr_library()
+zephyr_library_sources(custom_driver_left/trackball_led.c)
+zephyr_library_sources(custom_driver_left/bbtrackball_input_handler.c)
+zephyr_library_include_directories(${ZEPHYR_BASE}/drivers)
+zephyr_library_include_directories(../../../include)
+zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)

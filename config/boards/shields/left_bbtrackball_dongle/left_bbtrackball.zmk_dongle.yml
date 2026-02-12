@@ -1,0 +1,8 @@
+file_format: "1"
+id: left_bbtrackball_dongle
+name: left_bbtrackball_dongle
+type: shield
+url:
+requires:
+features:
+  - mouse

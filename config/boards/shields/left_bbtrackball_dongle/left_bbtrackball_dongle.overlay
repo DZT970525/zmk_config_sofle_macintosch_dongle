@@ -1,0 +1,69 @@
+/*
+*
+* Copyright (c) 2025 ZitaoTech
+* SPDX-License-Identifier: MIT
+*
+*/
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+    chosen {
+        zmk,trackball_led = &trackball_led;
+    };
+    trackball_led: pwmledo{
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm1 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pwm1_default>;
+    pinctrl-1 = <&pwm1_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+&i2c0 {
+    bbtrackball: bbtrackball@0 {
+        compatible = "zmk,bbtrackball";
+        reg = <0x0>;
+        status = "okay";
+    };
+};
+
+/ {
+    bbtrackball_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+    };
+    bbtrackball_listener: bbtrackball_listener {
+        compatible = "zmk,input-listener";
+        status = "disabled";
+        device = <&bbtrackball>;
+    };
+};
+
+
+&bbtrackball_split {
+    device = <&bbtrackball>;
+};
+
+&pinctrl {
+    pwm1_default:pwm1_default{
+        group1{
+            psels = <NRF_PSEL(PWM_OUT0, 0, 7)>; // Backlight for Trackball
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 7)>;
+            bias-pull-down;
+        };
+    };
+};
+
