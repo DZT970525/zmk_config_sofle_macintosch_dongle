@@ -1,0 +1,86 @@
+
+
+/ {
+    chosen {
+        zephyr,display = &st7789v;
+		zmk,display_backlight = &display_backlight;
+    };
+    display_backlight: pwmledfo {
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm1 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pwm1_default>;
+    pinctrl-1 = <&pwm1_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+
+&pinctrl {
+	spi0_default: spi0_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 12)>,<NRF_PSEL(SPIM_MOSI, 1, 9)>;
+		};
+	};
+
+	spi0_sleep: spi0_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 12)>,<NRF_PSEL(SPIM_MOSI, 1, 9)>;
+			low-power-enable;
+		};
+	};
+    pwm1_default: pwm1_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 14)>; // Display backlight led
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 14)>;
+            bias-pull-down;
+        };
+    };
+};
+
+&spi0 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	pinctrl-0 = <&spi0_default>;
+	pinctrl-1 = <&spi0_sleep>;
+	cs-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default", "sleep";
+	
+	st7789v: st7789v@0 {
+		compatible = "sitronix,st7789v";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+		cmd-data-gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+		width = <240>;
+		height = <240>;
+		x-offset = <0>;
+		y-offset = <0>;
+		vcom = <0x19>;
+		gctrl = <0x35>;
+		vrhs = <0x12>;
+		vdvs = <0x20>;
+		mdac = <0x00>;
+		lcm = <0x2c>;
+		colmod = <0x05>;
+		gamma = <0x01>;
+		porch-param = [08 08 00 22 22];
+		cmd2en-param = [5a 69 02 01];
+		pwctrl1-param = [a4 a1];
+		pvgam-param = [F0 00 0A 10 12 2A 3F 54 4B 1B 0E 0D 1F 23];
+		nvgam-param = [F0 00 0A 10 12 2C 3F 44 50 2D 1D 1F 20 23];
+		ram-param = [00 F0];
+		rgb-param = [CD 08 14];
+	};
+};

@@ -1,0 +1,380 @@
+if SHIELD_ST7789_DISPLAY
+
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
+    default y
+
+config ZMK_DISPLAY
+   default y
+   
+
+config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+    select LV_USE_LABEL
+    select LV_USE_BAR
+    select LV_USE_FLEX
+    select LV_USE_ROLLER
+    select LV_COLOR_SCREEN_TRANSP
+    select ZMK_WPM
+    
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+choice ZMK_DISPLAY_STATUS_SCREEN
+    default ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+endchoice
+
+config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+    select ZMK_WPM
+    imply ZMK_HID_INDICATORS
+
+choice ZMK_DISPLAY_WORK_QUEUE
+    default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
+endchoice
+
+config LV_Z_VDB_SIZE
+	default 64
+    
+config LV_DPI_DEF
+    default 148
+
+config LV_Z_BITS_PER_PIXEL
+    default 16
+
+choice ST7789V_PIXEL_FORMAT
+    default ST7789V_RGB565
+endchoice
+
+choice LV_COLOR_DEPTH
+    default LV_COLOR_DEPTH_16
+endchoice
+
+config LV_COLOR_16_SWAP
+	default n
+
+config LV_DISP_DEF_REFR_PERIOD
+    default 20
+
+choice LV_FONT_DEFAULT
+    default LV_FONT_DEFAULT_MONTSERRAT_20
+endchoice
+
+config PWM
+    default y
+
+config LED_PWM
+    default y
+    
+endif
+
+if SHIELD_ST7789_DISPLAY 
+
+config ZMK_SPLIT
+    default y
+
+config DEFAULT_SCREEN
+    string "Default screen"
+    default "snake"
+
+config SHOW_SINGLE_BATTERY
+    bool "Show single battery"
+    default n
+
+config USE_BATTERY_FONT_3X5
+    bool "Use battery font 3x5"
+    default n
+
+config DISPLAY_BRIGHTNESS
+    int "Display brightness"
+    default 100
+
+config MUTE_THRESHOLD
+    int "Mute threshold"
+    default 600
+
+config THEME_THRESHOLD
+    int "Theme threshold"
+    default 300
+
+config THEME_PRIMARY_COLOR
+    string "Theme primary color"
+    default "3dff98"
+
+config THEME_SECONDARY_COLOR
+    string "Theme secondary color"
+    default "ff4adc"
+
+config THEME_BG_COLOR
+    string "Theme background color"
+    default "222323"
+    
+config THEME_BG_DARKER_COLOR
+    string "Theme background darker color"
+    default "121313"
+
+config SNAKE_FATNESS
+    int "Snake fatness"
+    default 2
+
+config SPLASH_USE_SNAKE_2
+    bool "Use Snake 2 Splash screen"
+    default n
+
+config USE_SPLASH_SOUND
+    bool "Use splash sound"
+    default n
+
+config USE_FOOD_SOUND
+    bool "Use food sound"
+    default n
+
+config USE_DIE_SOUND
+    bool "Use food sound"
+    default n
+
+config USE_STATUS_SOUND
+    bool "Use status sound"
+    default y
+
+config USE_THEME_SOUND
+    bool "Use theme sound"
+    default n
+
+config USE_MENU_SOUND
+    bool "Use menu sound"
+    default n
+
+config USE_BUZZER
+    bool "Use buzzer"
+    default n
+
+config INFO_LEFT_SLOT
+    string "Info left slot"
+    default "connectivity"
+
+config INFO_RIGHT_SLOT
+    string "Info right slot"
+    default "layer"
+
+config SNAKE_BOARD_SIZE
+    string "Snake board size"
+    default "XL"
+
+config SNAKE_WALK_INTERVAL
+    int "Snake walk interval"
+    default 10
+
+config LOGO_WALK_INTERVAL
+    int "Logo walk interval"
+    default 50
+
+config CHECKERED_BOARD
+    bool "Checkered board"
+    default y
+
+config WPM_SLOW
+    int "WPM slow"
+    default 20
+
+config WPM_MEDIUM
+    int "WPM medium"
+    default 40
+
+config WPM_FAST
+    int "WPM fast"
+    default 80
+
+config WPM_SUPER_FAST
+    int "WPM super fast"
+    default 90
+    
+config USE_COMPLETE_CUSTOM_THEME
+    bool "Complete custom theme"
+    default n
+
+config SPLASH_LOGO_COLOR
+    string ""
+    default "000000"
+
+config SPLASH_CREATED_BY_COLOR
+    string ""
+    default "000000"
+
+config SPLASH_BG_COLOR
+    string ""
+    default "000000"
+
+config SNAKE_DEFAULT_COLOR
+    string ""
+    default "000000"
+
+config SNAKE_BOARD_COLOR
+    string ""
+    default "000000"
+
+config SNAKE_BOARD_1_COLOR
+    string ""
+    default "000000"
+
+config FOOD_COLOR
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_0
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_1
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_2
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_3
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_4
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_5
+    string ""
+    default "000000"
+
+config SNAKE_COLOR_6
+    string ""
+    default "000000"
+
+config BATTERY_NUM_COLOR
+    string ""
+    default "000000"
+
+config BATTERY_PERCENTAGE_COLOR
+    string ""
+    default "000000"
+
+config BATTERY_BG_COLOR
+    string ""
+    default "000000"
+
+config BATTERY_NUM_COLOR_1
+    string ""
+    default "000000"
+
+config BATTERY_PERCENTAGE_COLOR_1
+    string ""
+    default "000000"
+
+config BATTERY_BG_COLOR_1
+    string ""
+    default "000000"
+
+config MODIFIER_SELECTED_COLOR
+    string ""
+    default "000000"
+
+config MODIFIER_UNSELECTED_COLOR
+    string ""
+    default "000000"
+
+config MODIFIER_BG_COLOR
+    string ""
+    default "000000"
+
+config SYMBOL_SELECTED_COLOR
+    string ""
+    default "000000"
+
+config SYMBOL_UNSELECTED_COLOR
+    string ""
+    default "000000"
+
+config SYMBOL_BG_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_OK_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_NOT_OK_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_OPEN_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_BG_COLOR
+    string ""
+    default "000000"
+
+config BT_NUM_COLOR
+    string ""
+    default "000000"
+
+config BT_BG_COLOR
+    string ""
+    default "000000"
+
+config LAYER_FONT_COLOR
+    string ""
+    default "000000"
+
+config LAYER_FONT_BG_COLOR
+    string ""
+    default "000000"
+
+config THEME_FONT_BG_COLOR
+    string ""
+    default "000000"
+
+config THEME_FONT_COLOR
+    string ""
+    default "000000"
+
+config THEME_FONT_COLOR_1
+    string ""
+    default "000000"
+
+config LOGO_FONT_COLOR
+    string ""
+    default "000000"
+
+config LOGO_SNAKE_COLOR
+    string ""
+    default "000000"
+
+config LOGO_BG_COLOR
+    string ""
+    default "000000"
+
+config FRAME_COLOR
+    string ""
+    default "000000"
+
+config FRAME_COLOR_1
+    string ""
+    default "000000"
+
+config MENU_BG_COLOR
+    string ""
+    default "000000"
+
+config WPM_FONT_COLOR
+    string ""
+    default "000000"
+
+config WPM_FONT_1_COLOR
+    string ""
+    default "000000"
+
+config WPM_FONT_BG_COLOR
+    string ""
+    default "000000"
+
+
+
+endif
+

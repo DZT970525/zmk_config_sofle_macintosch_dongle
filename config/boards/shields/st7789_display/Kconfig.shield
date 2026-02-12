@@ -1,0 +1,15 @@
+# Copyright (c) 2022 Duccio Breschi
+# SPDX-License-Identifier: MIT
+
+config SHIELD_ST7789_DISPLAY
+    def_bool $(shields_list_contains,st7789_display)
+
+config DISPLAY_BACKLIGHT_BRIGHTNESS
+    int "display backlight normal brightness"
+    default 80
+    range 0 100
+
+config DISPLAY_BACKLIGHT_IDLE_BRIGHTNESS
+    int "display backlight idle brightness"
+    default 40
+    range 0 100
