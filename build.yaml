@@ -1,0 +1,16 @@
+---
+include:
+  - board: sofle_dongle
+    shield: st7789_display
+  - board: sofle_dongle_left
+    shield: lpm_view;left_bbtrackball
+  - board: sofle_dongle_right
+    shield: lpm_view;right_trackpoint
+
+
+  - board: sofle_dongle
+    shield: st7789_display;settings_reset
+  - board: sofle_dongle_left
+    shield: lpm_view;left_bbtrackball;settings_reset
+  - board: sofle_dongle_right
+    shield: lpm_view;right_trackpoint;settings_reset
