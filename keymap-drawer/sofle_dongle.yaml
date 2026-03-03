@@ -1,0 +1,75 @@
+layout: {zmk_keyboard: sofle_dongle}
+layers:
+  QWERTY: ['&bootloader', ESC, '1', '2', '3', '4', '5', MUTE, MUTE, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, ENTER, CAPS, A, S, D, F, G,
+    '&mkp LCLK', '&mkp LCLK', H, J, K, L, ;, '''', LSHFT, Z, X, C, V, B, PG DN, PG UP, '&mkp LCLK', '&mkp RCLK', N, M, ',', ., /, DEL, LCTRL, LALT, LGUI, SPACE, FUNCTION,
+    FUNCTION, SPACE, RGUI, RALT, RCTRL]
+  FUNCTION:
+  - '&bootloader'
+  - '`'
+  - F1
+  - F2
+  - F3
+  - F4
+  - F5
+  - BT CLR
+  - MUTE
+  - F6
+  - F7
+  - F8
+  - F9
+  - F10
+  - BSPC
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - UP
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - OUT TOG
+  - F11
+  - F12
+  - {t: ▽, type: trans}
+  - UP
+  - {t: ▽, type: trans}
+  - ENTER
+  - {t: ▽, type: trans}
+  - LEFT
+  - DOWN
+  - RIGHT
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&mkp RCLK'
+  - '&mkp RCLK'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - LEFT
+  - DOWN
+  - RIGHT
+  - ''''
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - RGB TOG
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&bl BL_DEC'
+  - '&bl BL_INC'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&bootloader'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: FUNCTION, type: held}
+  - FUNCTION
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&bootloader'
+  RESERVE: ['&bootloader', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
