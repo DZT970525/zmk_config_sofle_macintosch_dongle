@@ -4,9 +4,92 @@
 config SHIELD_RIGHT_TRACKPOINT_DONGLE
     def_bool $(shields_list_contains,right_trackpoint_dongle)
 
+menu "TrackPoint Advanced Settings"
+
 config TRACKPOINT_EXPONENTIAL
     bool "Enable TrackPoint exponential acceleration"
     default n
     help
       Enable exponential acceleration for TrackPoint movement,
       similar to trackball behavior.
+
+config TRACKPOINT_TOGGLE_KEY_POSITION
+    int "Key position to toggle mouse/scroll mode"
+    default 62
+    help
+      ZMK position code of the key used to toggle between mouse and scroll mode.
+
+config TRACKPOINT_START_IN_SCROLL_MODE
+    bool "Start in scroll mode by default"
+    default y
+    help
+      If yes (y), the default state is scroll mode, and holding the toggle key switches to mouse mode.
+      If no (n), the default state is mouse mode, and holding the toggle key switches to scroll mode.
+
+config TRACKPOINT_SCROLL_X_DIR
+    int "Scroll X direction multiplier (1 for normal, -1 for inverted)"
+    default 1
+
+config TRACKPOINT_SCROLL_Y_DIR
+    int "Scroll Y direction multiplier (1 for normal, -1 for inverted)"
+    default 1
+
+config TRACKPOINT_SCROLL_DEADZONE
+    int "Scroll deadzone"
+    default 2
+    help
+      Deadzone to filter out slight hand tremors.
+
+config TRACKPOINT_SCROLL_INPUT_MAX
+    int "Scroll input max"
+    default 128
+
+config TRACKPOINT_SCROLL_DIVISOR_SLOW
+    int "Scroll divisor slow (Fine-grained control)"
+    default 60
+
+config TRACKPOINT_SCROLL_DIVISOR_FAST
+    int "Scroll divisor fast (Max speed limit)"
+    default 8
+
+config TRACKPOINT_DOMINANT_NUMERATOR
+    int "Dominant axis numerator for accidental touch prevention"
+    default 3
+
+config TRACKPOINT_DOMINANT_DENOMINATOR
+    int "Dominant axis denominator for accidental touch prevention"
+    default 2
+
+config TRACKPOINT_MOUSE_BASE_SPEED_PERCENT
+    int "Mouse base speed (Percentage, 50 = 0.5)"
+    default 50
+
+config TRACKPOINT_MOUSE_SENS_BASE_PERCENT
+    int "Mouse sensitivity base (Percentage, 30 = 0.3)"
+    default 30
+
+config TRACKPOINT_MOUSE_SENS_STEP_PERCENT
+    int "Mouse sensitivity step per LED brightness (Percentage, 1 = 0.01)"
+    default 1
+
+config CUSTOM_LED_BRT_UP_POS
+    int "Custom LED Brightness UP key position"
+    default 49
+
+config CUSTOM_LED_BRT_DOWN_POS
+    int "Custom LED Brightness DOWN key position"
+    default 50
+
+config CUSTOM_LED_BRT_DEFAULT
+    int "Custom LED Default Brightness (10-255)"
+    default 128
+    help
+      Default brightness level of the Dongle LED on boot.
+
+config CUSTOM_LED_BRT_STEP
+    int "Custom LED Brightness Adjustment Step"
+    default 25
+    help
+      The amount of brightness added or subtracted per key press.
+
+endmenu

@@ -248,7 +248,7 @@ void print_initial_animation() {
     uint8_t logo_chars_len = 5;
     print_string(snake_logo_buf, logo_chars, snake_logo_x, snake_logo_y, snake_logo_font_scale, get_logo_font_color(), get_logo_bg_color(), FONT_SIZE_3x5, char_gap_pixels, logo_chars_len);
     
-    for (uint16_t i; i < animation_sections_total; i++) {
+    for (uint16_t i = 0; i < animation_sections_total; i++) {
         Section s = get_section(i);
         if (i == 5 || i == 6 || i == 7) {
             print_animation_space(s);
