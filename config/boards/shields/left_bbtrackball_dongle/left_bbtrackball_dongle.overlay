@@ -35,22 +35,32 @@
 };
 
 / {
-    bbtrackball_inputs {
+    split_inputs {
         #address-cells = <1>;
         #size-cells = <0>;
 
+        /* BB Trackball */
+        bbtrackball_split: bbtrackball_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+
     };
+
+    /* Listeners */
     bbtrackball_listener: bbtrackball_listener {
         compatible = "zmk,input-listener";
         status = "disabled";
-        device = <&bbtrackball>;
+        device = <&bbtrackball_split>;
     };
+
 };
 
 
 &bbtrackball_split {
     device = <&bbtrackball>;
 };
+
 
 &pinctrl {
     pwm1_default:pwm1_default{

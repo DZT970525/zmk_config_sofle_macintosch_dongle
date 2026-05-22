@@ -124,27 +124,6 @@
 };
 
 
-/ {
-    split_inputs {
-        #address-cells = <1>;
-        #size-cells = <0>;
-
-        /* BB Trackball */
-        bbtrackball_split: bbtrackball_split@0 {
-            compatible = "zmk,input-split";
-            reg = <0>;
-        };
-
-    };
-
-    /* Listeners */
-    bbtrackball_listener: bbtrackball_listener {
-        compatible = "zmk,input-listener";
-        status = "disabled";
-        device = <&bbtrackball_split>;
-    };
-
-};
 
 lpm_view_spi: &spi2 {
     compatible = "nordic,nrf-spim";

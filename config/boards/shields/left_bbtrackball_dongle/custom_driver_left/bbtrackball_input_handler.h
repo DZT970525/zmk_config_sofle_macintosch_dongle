@@ -18,7 +18,7 @@ extern "C" {
  *
  * @return true if moved
  */
-bool trackball_is_moving(void);
+bool trackball_is_active(void);
 
 #ifdef __cplusplus
 }
