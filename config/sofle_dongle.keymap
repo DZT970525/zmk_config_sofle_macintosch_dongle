@@ -141,7 +141,7 @@
             display-name = "MOUSE";
             bindings = <
                                                                          &BOT
-&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &bt CAPS                       &kp PRINTSCREEN       &none      &none      &none   &none         &none  &kp BSPC            
+&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &kp CAPS                       &kp PRINTSCREEN       &none      &none      &none   &none         &none  &kp BSPC            
 &kp TAB   &kp Q     &kp W      &kp E    &kp R    &kp T                                                        &none      &mkp MB3   &none   &none         &none  &none
 &kp CAPS  &kp A     &kp S      &kp D    &kp F    &none      &mkp LCLK                        &mkp LCLK        &none      &mkp LCLK  &none   &none         &none  &none
 &kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &none  &none     &none      &mkp RCLK  &none   &msc SCRL_UP  &none  &none
