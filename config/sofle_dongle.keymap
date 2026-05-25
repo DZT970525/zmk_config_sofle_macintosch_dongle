@@ -148,5 +148,16 @@
                     &kp LCTRL  &kp LGUI &kp LALT &kp SPACE  &to 0                                   &to 0     &kp SPACE  &to 0      &none   &msc SCRL_DOWN
             >;
         };
+      RES_layer { 
+            display-name = "RESERVE";
+            bindings = <
+                                                                         &BOT
+&none     &none     &none      &none    &none    &none   &none                        &none            &none   &none  &none   &none  &none  &none            
+&none     &none     &none      &none    &none    &none                                                 &none   &none  &none   &none  &none  &none
+&none     &none     &none      &none    &none    &none   &none                        &none            &none   &none  &none   &none  &none  &none
+&none     &none     &none      &none    &none    &none   &none   &none                &none  &none     &none   &none  &none   &none  &none  &none
+                    &none      &none    &none    &none   &none                                         &none   &none  &none   &none  &none
+            >;
+        };
     };
 };
