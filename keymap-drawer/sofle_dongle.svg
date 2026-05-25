@@ -385,16 +385,18 @@ path.combo {
 </g>
 <g transform="translate(374, 420) rotate(23.869)" class="key keypos-61">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#NUM--DIR">
+<a href="#DIR--NUM">
 <text x="0" y="0" class="key tap layer-activator">
-<tspan x="0" dy="-1.2em">NUM</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">DIR</tspan>
+<tspan x="0" dy="-1.2em">DIR</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">NUM</tspan>
 </text>
 </a><text x="0" y="24" class="key hold">toggle</text>
 </g>
 <g transform="translate(486, 424) rotate(-23.869)" class="key keypos-62">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#FUNCTION">
-<text x="0" y="0" class="key tap layer-activator"><tspan style="font-size: 88%">FUNCTION</tspan></text>
+<a href="#FUNC--SYM">
+<text x="0" y="0" class="key tap layer-activator">
+<tspan x="0" dy="-1.2em">FUNC</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">SYM</tspan>
+</text>
 </a><text x="0" y="24" class="key hold">toggle</text>
 </g>
 <g transform="translate(550, 405) rotate(-11.93)" class="key keypos-63">
@@ -417,8 +419,8 @@ path.combo {
 </g>
 </g>
 </g>
-<g transform="translate(30, 517)" class="layer-NUM &amp; DIR">
-<text x="0" y="28" class="label" id="NUM--DIR">NUM &amp; DIR:</text>
+<g transform="translate(30, 517)" class="layer-DIR &amp; NUM">
+<text x="0" y="28" class="label" id="DIR--NUM">DIR &amp; NUM:</text>
 <g transform="translate(0, 56)">
 <g transform="translate(434, 28)" class="key keypos-0">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -699,8 +701,10 @@ path.combo {
 </g>
 <g transform="translate(486, 424) rotate(-23.869)" class="key keypos-62">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#FUNCTION">
-<text x="0" y="0" class="key tap layer-activator"><tspan style="font-size: 88%">FUNCTION</tspan></text>
+<a href="#FUNC--SYM">
+<text x="0" y="0" class="key tap layer-activator">
+<tspan x="0" dy="-1.2em">FUNC</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">SYM</tspan>
+</text>
 </a><text x="0" y="24" class="key hold">toggle</text>
 </g>
 <g transform="translate(550, 405) rotate(-11.93)" class="key keypos-63">
@@ -729,8 +733,8 @@ path.combo {
 </g>
 </g>
 </g>
-<g transform="translate(30, 1035)" class="layer-FUNCTION">
-<text x="0" y="28" class="label" id="FUNCTION">FUNCTION:</text>
+<g transform="translate(30, 1035)" class="layer-FUNC &amp; SYM">
+<text x="0" y="28" class="label" id="FUNC--SYM">FUNC &amp; SYM:</text>
 <g transform="translate(0, 56)">
 <g transform="translate(434, 28)" class="key keypos-0">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -977,9 +981,9 @@ path.combo {
 </g>
 <g transform="translate(374, 420) rotate(23.869)" class="key keypos-61">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<a href="#NUM--DIR">
+<a href="#DIR--NUM">
 <text x="0" y="0" class="key tap layer-activator">
-<tspan x="0" dy="-1.2em">NUM</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">DIR</tspan>
+<tspan x="0" dy="-1.2em">DIR</tspan><tspan x="0" dy="1.2em">&amp;</tspan><tspan x="0" dy="1.2em">NUM</tspan>
 </text>
 </a><text x="0" y="24" class="key hold">toggle</text>
 </g>
