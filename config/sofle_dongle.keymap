@@ -112,7 +112,7 @@
 
 
         lower_layer {
-            display-name = "DIR & NUM";
+            display-name = "DIR+NUM";
             bindings = <
                                                                                  &BOT
 &kp ESC     &kp LPAR  &none      &none      &kp DOLLAR  &none      &kp CAPS                         &kp PRINTSCREEN                 &none         &kp KP_N7      &kp KP_N8        &kp KP_N9      &kp RPAR      &kp BACKSPACE
@@ -127,7 +127,7 @@
         };
 
         raise_layer {
-            display-name = "FUNC & SYM";
+            display-name = "FUNC+SYM";
             bindings = <
                                                                        &BOT
 &kp ESC     &kp F1    &kp F2     &kp F3     &kp F4     &bl BL_DEC  &bt BT_CLR                &kp C_MUTE                &bl BL_INC   &none       &none      &none       &none       &kp BACKSPACE
