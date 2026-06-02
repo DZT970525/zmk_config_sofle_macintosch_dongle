@@ -62,13 +62,13 @@ layers:
   - LALT
   - SPACE
   - SPACE
-  - {t: DIR & NUM, h: toggle}
-  - {t: FUNC & SYM, h: toggle}
+  - {t: DIR+NUM, h: toggle}
+  - {t: FUNC+SYM, h: toggle}
   - KP PLUS
   - '-'
   - '*'
   - /
-  DIR & NUM:
+  DIR+NUM:
   - '&bootloader'
   - ESC
   - (
@@ -131,12 +131,12 @@ layers:
   - SPACE
   - SPACE
   - {t: DEFAULT, h: toggle}
-  - {t: FUNC & SYM, h: toggle}
+  - {t: FUNC+SYM, h: toggle}
   - KP PLUS
   - KP MINUS
   - KP ASTERISK
   - KP DIVIDE
-  FUNC & SYM:
+  FUNC+SYM:
   - '&bootloader'
   - ESC
   - F1
@@ -198,7 +198,7 @@ layers:
   - LALT
   - SPACE
   - SPACE
-  - {t: DIR & NUM, h: toggle}
+  - {t: DIR+NUM, h: toggle}
   - {t: DEFAULT, h: toggle}
   - ''
   - ''
