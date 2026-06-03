@@ -338,27 +338,30 @@ static void trackpoint_work_cb(struct k_work *work) {
         process_arrow_axis(dev, dy, &data->arrow_residue_y,
                            INPUT_BTN_2,  // 上
                            INPUT_BTN_3); // 下
-    } else if (scroll_key_pressed || capslock) {
+    } else if (scroll_key_pressed ) {
 
         if (just_enter_scroll) {
             data->scroll_residue_x = dx * SCROLL_X_DIR;
             data->scroll_residue_y = dy * SCROLL_Y_DIR;
         }
 
-        int abs_dx = abs(dx);
-        int abs_dy = abs(dy);
+        float speed = sqrtf((float)(dx * dx + dy * dy));
+        float scale = (speed > 80)   ? 0.05f
+                      : (speed > 40) ? 0.04f
+                      : (speed > 20) ? 0.03f
+                      : (speed > 5)  ? 0.02f
+                                     : 0.015f;
+        scroll_residual_x += dx * scale;
+        scroll_residual_y += dy * scale;
 
-        if (abs_dy * DOMINANT_DENOMINATOR > abs_dx * DOMINANT_NUMERATOR) {
-            dx = 0;
-        } else if (abs_dx * DOMINANT_DENOMINATOR > abs_dy * DOMINANT_NUMERATOR) {
-            dy = 0;
-        } else {
-            dx = 0;
-            dy = 0;
-        }
+        int16_t out_x = (int16_t)scroll_residual_x;
+        int16_t out_y = (int16_t)scroll_residual_y;
 
-        process_scroll_axis(dev, dx, &data->scroll_residue_x, INPUT_REL_HWHEEL, SCROLL_X_DIR);
-        process_scroll_axis(dev, dy, &data->scroll_residue_y, INPUT_REL_WHEEL, SCROLL_Y_DIR);
+        scroll_residual_x -= out_x;
+        scroll_residual_y -= out_y;
+        input_report_rel(dev, INPUT_REL_HWHEEL, -out_x, false, K_FOREVER);
+        input_report_rel(dev, INPUT_REL_WHEEL, out_y, true, K_FOREVER);
+        k_msleep(25);
 
     } else {
 
@@ -384,6 +387,7 @@ static void trackpoint_work_cb(struct k_work *work) {
     last_scroll_key_pressed = scroll_key_pressed;
     last_arrow_key_pressed = arrow_key_pressed;
     data->last_packet_time = now;
+    k_msleep(5);
 }
 
 /* ========= ★ GPIO 中断 ========= */
