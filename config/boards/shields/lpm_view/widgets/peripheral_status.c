@@ -40,7 +40,7 @@ struct peripheral_status_state {
 
 // ==================== 图片数组 ====================
 static const lv_img_dsc_t *bunny_frames[] = {
-    &cat, &astronaut, &david, &vader, &blackhole, &plane, &mounta,
+    &cat, &astronaut, &david, &blackhole, &plane, &mounta,
 };
 
 #define BUNNY_FRAME_COUNT (sizeof(bunny_frames) / sizeof(bunny_frames[0]))
