@@ -1,6 +1,6 @@
 layout: {zmk_keyboard: sofle_dongle}
 layers:
-  '5':
+  '4':
   - '&bootloader'
   - ESC
   - '1'
@@ -62,13 +62,13 @@ layers:
   - LALT
   - SPACE
   - SPACE
-  - {t: '%', h: toggle}
-  - {t: F5, h: toggle}
+  - {t: $, h: toggle}
+  - {t: F4, h: toggle}
   - KP PLUS
   - '-'
   - '*'
   - /
-  '%':
+  $:
   - '&bootloader'
   - ESC
   - '`'
@@ -130,13 +130,13 @@ layers:
   - LALT
   - SPACE
   - SPACE
-  - {t: '5', h: toggle}
-  - {t: F5, h: toggle}
+  - {t: '4', h: toggle}
+  - {t: F4, h: toggle}
   - KP PLUS
   - KP MINUS
   - KP ASTERISK
   - KP DIVIDE
-  F5:
+  F4:
   - '&bootloader'
   - ESC
   - F1
@@ -198,13 +198,13 @@ layers:
   - LALT
   - SPACE
   - SPACE
-  - {t: '%', h: toggle}
-  - {t: '5', h: toggle}
+  - {t: $, h: toggle}
+  - {t: '4', h: toggle}
   - ''
   - ''
   - ''
   - ''
-  MOUSE:
+  M:
   - '&bootloader'
   - ESC
   - '1'
@@ -266,9 +266,9 @@ layers:
   - LGUI
   - LALT
   - SPACE
-  - {t: '5', h: toggle}
-  - {t: '5', h: toggle}
+  - {t: '4', h: toggle}
+  - {t: '4', h: toggle}
   - SPACE
-  - {t: '5', h: toggle}
+  - {t: '4', h: toggle}
   - ''
   - '&msc SCRL_DOWN'
