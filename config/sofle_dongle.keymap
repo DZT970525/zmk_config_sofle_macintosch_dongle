@@ -115,7 +115,7 @@
             display-name = "DIR+NUM";
             bindings = <
                                                                                  &BOT
-&kp ESC     &kp LPAR  &none      &none      &kp DOLLAR  &kp CAPS      &kp CAPS                         &kp PRINTSCREEN                 &kp PRINTSCREEN         &kp KP_N7      &kp KP_N8        &kp KP_N9      &kp RPAR      &kp BACKSPACE
+&kp ESC     &kp grave  &none      &none      &kp DOLLAR  &kp CAPS      &kp CAPS                         &kp PRINTSCREEN                 &kp PRINTSCREEN         &kp KP_N7      &kp KP_N8        &kp KP_N9      &kp RPAR      &kp BACKSPACE
 &kp TAB     &none     &none      &kp UP     &none       &kp KP_NUMLOCK                                                                      &none         &kp KP_N4     &kp KP_N5         &kp KP_N6      &kp KP_COMMA  &kp BACKSLASH
 &kp LSHFT   &kp A     &kp LEFT   &kp DOWN   &kp RIGHT   &none      &mkp LCLK                        &trans                          &none         &kp KP_N1      &kp KP_N2        &kp KP_N3      &kp KP_ENTER  &kp RETURN
 &kp LCTRL   &kp Z     &kp X      &kp C      &kp V       &none      &mkp LCLK    &mkp RCLK           &kp PAGE_DOWN    &kp PAGE_UP      &none         &kp KP_N0      &kp KP_N0        &kp KP_DOT     &kp KP_EQUAL  &kp DEL
