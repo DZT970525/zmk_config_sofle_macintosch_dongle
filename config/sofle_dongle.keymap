@@ -98,7 +98,7 @@
         compatible = "zmk,keymap";
 
          default_layer {
-            display-name = "DEFAULT";
+            display-name = "5";
            bindings = <
                                                                             &BOT
 &kp ESC    &kp N1   &kp N2     &kp N3   &kp N4     &kp N5    &kp CAPS                      &kp PRINTSCREEN          &kp N6       &kp N7      &kp N8     &kp N9    &kp N0     &kp BSPC            
@@ -112,7 +112,7 @@
 
 
         lower_layer {
-            display-name = "DIR+NUM";
+            display-name = "%";
             bindings = <
                                                                                  &BOT
 &kp ESC     &kp grave  &none      &none      &kp DOLLAR  &kp CAPS      &kp CAPS                         &kp PRINTSCREEN                 &kp PRINTSCREEN         &kp KP_N7      &kp KP_N8        &kp KP_N9      &kp RPAR      &kp BACKSPACE
@@ -127,7 +127,7 @@
         };
 
         raise_layer {
-            display-name = "FUNC+SYM";
+            display-name = "F5";
             bindings = <
                                                                        &BOT
 &kp ESC     &kp F1    &kp F2     &kp F3     &kp F4     &bl BL_DEC  &bt BT_CLR                &kp C_MUTE                &bl BL_INC   &kp PRINTSCREEN       &none      &none       &none       &kp BACKSPACE
