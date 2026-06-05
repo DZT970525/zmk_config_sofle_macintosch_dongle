@@ -71,7 +71,7 @@ layers:
   DIR+NUM:
   - '&bootloader'
   - ESC
-  - (
+  - grave
   - ''
   - ''
   - $
