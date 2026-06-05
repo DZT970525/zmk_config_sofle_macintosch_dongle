@@ -75,10 +75,10 @@ layers:
   - ''
   - ''
   - $
-  - ''
+  - CAPS
   - CAPS
   - PRINTSCREEN
-  - ''
+  - PRINTSCREEN
   - KP 7
   - KP 8
   - KP 9
@@ -89,7 +89,7 @@ layers:
   - ''
   - UP
   - ''
-  - ''
+  - KP NUMLOCK
   - ''
   - KP 4
   - KP 5
@@ -147,7 +147,7 @@ layers:
   - BT CLR
   - MUTE
   - '&bl BL_INC'
-  - ''
+  - PRINTSCREEN
   - ''
   - ''
   - ''
