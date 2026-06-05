@@ -71,7 +71,7 @@ layers:
   '%':
   - '&bootloader'
   - ESC
-  - grave
+  - '`'
   - ''
   - ''
   - $
