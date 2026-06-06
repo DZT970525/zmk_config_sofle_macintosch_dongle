@@ -169,16 +169,16 @@ void set_battery_symbol() {
     draw_battery_bars();
 
 #ifdef CONFIG_SHOW_SINGLE_BATTERY
-    print_percentage(battery_state_0.level, start_x_peripheral_1 + single_battery_offset, start_y,
-                     scale, get_battery_num_color(), get_battery_bg_color(),
-                     get_battery_percentage_color());
+   // print_percentage(battery_state_0.level, start_x_peripheral_1 + single_battery_offset, start_y,
+   //                  scale, get_battery_num_color(), get_battery_bg_color(),
+  //                   get_battery_percentage_color());
 #else
-    print_percentage(battery_state_0.level, start_x_peripheral_1, start_y,
-                     scale, get_battery_num_color(), get_battery_bg_color(),
-                     get_battery_percentage_color());
-    print_percentage(battery_state_1.level, start_x_peripheral_2, start_y,
-                     scale, get_battery_num_color_1(), get_battery_bg_color_1(),
-                     get_battery_percentage_color_1());
+   // print_percentage(battery_state_0.level, start_x_peripheral_1, start_y,
+    //                 scale, get_battery_num_color(), get_battery_bg_color(),
+    //                 get_battery_percentage_color());
+   // print_percentage(battery_state_1.level, start_x_peripheral_2, start_y,
+   //                 scale, get_battery_num_color_1(), get_battery_bg_color_1(),
+    //                 get_battery_percentage_color_1());
 #endif
 }
 
@@ -211,14 +211,14 @@ ZMK_SUBSCRIPTION(widget_battery_status, zmk_peripheral_battery_state_changed);
 
 void print_empty_batteries() {
 #ifdef CONFIG_SHOW_SINGLE_BATTERY
-    print_percentage(0, start_x_peripheral_1 + single_battery_offset, start_y, scale,
-                     get_battery_num_color(), get_battery_bg_color(),
-                     get_battery_percentage_color());
+  //  print_percentage(0, start_x_peripheral_1 + single_battery_offset, start_y, scale,
+  //                   get_battery_num_color(), get_battery_bg_color(),
+   //                  get_battery_percentage_color());
 #else
-    print_percentage(0, start_x_peripheral_1, start_y, scale, get_battery_num_color(),
-                     get_battery_bg_color(), get_battery_percentage_color());
-    print_percentage(0, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(),
-                     get_battery_bg_color_1(), get_battery_percentage_color_1());
+  //  print_percentage(0, start_x_peripheral_1, start_y, scale, get_battery_num_color(),
+  //                   get_battery_bg_color(), get_battery_percentage_color());
+  //  print_percentage(0, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(),
+  //                   get_battery_bg_color_1(), get_battery_percentage_color_1());
 #endif
 }
 
