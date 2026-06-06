@@ -34,23 +34,24 @@ static uint16_t *scaled_bitmap_bt_num;
 
 static const uint16_t status_height = 9;
 static const uint16_t status_width = 9;
-static const uint16_t status_scale = 3;
+static const uint16_t status_scale = 2; // slightly smaller for upper-right
 
 static const uint16_t symbol_scale = 2;
 static const uint16_t symbol_width = 9;
 static const uint16_t symbol_height = 15;
 
-static const uint16_t bt_num_scale = 4;
+static const uint16_t bt_num_scale = 3;
 static const uint16_t bt_num_width = 5;
 static const uint16_t bt_num_height = 7;
 
-static uint16_t bluetooth_profiles_x = 58;
-static uint16_t bluetooth_profiles_y = 117;
-static uint16_t bluetooth_status_x = 84;
-static uint16_t bluetooth_status_y = 117;
-static uint16_t symbol_usb_x = 12;
-static uint16_t symbol_ble_x = 36;
-static uint16_t symbols_y = 116;
+// Upper-right corner positions (next to right battery bar)
+static uint16_t bluetooth_profiles_x = 172;
+static uint16_t bluetooth_profiles_y = 14;
+static uint16_t bluetooth_status_x = 194;
+static uint16_t bluetooth_status_y = 14;
+static uint16_t symbol_usb_x = 132;
+static uint16_t symbol_ble_x = 152;
+static uint16_t symbols_y = 12;
 
 static const uint16_t usb_ready_bitmap[] = {
     0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -208,9 +209,6 @@ void print_symbols(uint16_t usb_x, uint16_t ble_x, uint16_t y, struct output_sta
 }
 
 void set_status_symbol() {
-    if (connectivity_slot_side == SLOT_SIDE_NONE) {
-        return;
-    }
     print_bluetooth_profiles(bluetooth_profiles_x, bluetooth_profiles_y, status_state);
     print_bluetooth_status(bluetooth_status_x, bluetooth_status_y, status_state);
     print_symbols(symbol_usb_x, symbol_ble_x, symbols_y, status_state);
@@ -242,14 +240,7 @@ void zmk_widget_output_status_init() {
 
     scaled_bitmap_status = k_malloc(bitmap_size_status * 2 * sizeof(uint16_t));
 
-    connectivity_slot_side = get_slot_to_print(INFO_SLOT_CONNECTIVITY);
-    if (connectivity_slot_side == SLOT_SIDE_RIGHT) {
-        bluetooth_profiles_x += 120;
-        bluetooth_status_x += 120;
-        symbol_usb_x += 120;
-        symbol_ble_x += 120;
-    }
-
+    // Fixed position — no slot offset (always upper-right)
     widget_output_status_init();
 }
 
