@@ -204,7 +204,8 @@ static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern) {
     int spc = 7;
 
     for (int i = 0; i < 3; i++) {
-        int ly = TMP_RC - 6 + i * (thick + spc);
+        int ly = TMP_RC - 11 + i * (thick + spc);
+
         uint8_t bit = (pattern >> (2 - i)) & 1;
 
         if (bit == 0) {
@@ -243,8 +244,10 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
             int dx = bx - TMP_RC;
             int dy = by - TMP_RC;
 
-            int sx = TMP_RC + (dx * cos_a - dy * sin_a + 512) / 1024;
-            int sy = TMP_RC + (dx * sin_a + dy * cos_a + 512) / 1024;
+            int sx = TMP_RC + (dx * cos_a + dy * sin_a + 512) / 1024;
+
+            int sy = TMP_RC + (-dx * sin_a + dy * cos_a + 512) / 1024;
+
 
             if (sx >= 0 && sx < TMP_BUF_W && sy >= 0 && sy < TMP_BUF_H) {
                 dst[by * TMP_BUF_W + bx] = src[sy * TMP_BUF_W + sx];
