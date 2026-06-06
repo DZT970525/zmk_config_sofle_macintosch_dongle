@@ -28,7 +28,7 @@ static bool layer_widget_running = false;
 static struct layer_status_state current_layer;
 static struct layer_status_state last_printed_layer;
 
-static uint16_t layer_font_scale = 3;
+static uint16_t layer_font_scale = 4;
 static uint16_t layer_font_width = 3;
 static uint16_t layer_font_height = 5;
 static uint16_t *scaled_bitmap_layer_font;
@@ -36,9 +36,9 @@ static uint16_t *scaled_bitmap_layer_font;
 SlotSide layer_slot_side = SLOT_SIDE_NONE;
 
 // Upper-left position — right next to the left battery bar
-static uint16_t layer_x = 25;
-static uint16_t layer_x_end = 115;
-static uint16_t layer_y = 12;
+static uint16_t layer_x = 5;
+static uint16_t layer_x_end = 155;
+static uint16_t layer_y = 5;
 static uint8_t label_limit = 100;
 
 typedef enum {
@@ -141,7 +141,7 @@ void clear_last_printed_label() {
     uint16_t gap = get_gap(len);
     uint16_t scale = get_scale(len);
     print_repeat_char(scaled_bitmap_layer_font, CHAR_NONE, x, y, scale, get_layer_font_color(),
-                      get_layer_font_bg_color(), FONT_SIZE_5x8, gap, len, label_limit);
+                      get_layer_font_bg_color(), FONT_SIZE_3x6, gap, len, label_limit);
 }
 
 void print_layer() {
@@ -154,7 +154,7 @@ void print_layer() {
     ;
     uint16_t scale = get_scale(len);
     print_char_array(scaled_bitmap_layer_font, current_layer.label, x, y, scale,
-                     get_layer_font_color(), get_layer_font_bg_color(), FONT_SIZE_5x8, gap, len,
+                     get_layer_font_color(), get_layer_font_bg_color(), FONT_SIZE_3x6, gap, len,
                      label_limit);
 
     last_printed_layer = current_layer;
