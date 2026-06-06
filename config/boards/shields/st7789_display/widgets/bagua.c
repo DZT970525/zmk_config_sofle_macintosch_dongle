@@ -204,7 +204,8 @@ static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern) {
     int spc = 7;
 
     for (int i = 0; i < 3; i++) {
-        int ly = TMP_RC - 11 + i * (thick + spc);
+        int ly = TMP_RC - 6 + i * (thick + spc);
+
 
         uint8_t bit = (pattern >> (2 - i)) & 1;
 
