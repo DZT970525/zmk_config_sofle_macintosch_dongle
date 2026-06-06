@@ -336,6 +336,7 @@ void zmk_widget_bagua_init(void) {
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
     trigram_horiz = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
     trigram_rot = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
+    k_work_init_delayable(&bagua_blink_work, bagua_blink_handler);
     bagua_initialized = true;
 }
 
