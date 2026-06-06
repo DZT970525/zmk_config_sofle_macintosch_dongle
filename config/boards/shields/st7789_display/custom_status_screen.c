@@ -77,6 +77,7 @@ lv_obj_t *zmk_display_status_screen() {
     zmk_widget_output_status_init();
     zmk_widget_peripheral_battery_status_init();
     zmk_widget_layer_init();
+    start_layer_status();
     zmk_widget_action_button_init();
     zmk_widget_wpm_init();
     zmk_widget_modifier_init();
