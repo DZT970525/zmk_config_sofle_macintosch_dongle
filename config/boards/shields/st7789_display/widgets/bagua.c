@@ -274,10 +274,15 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 
 // ============== BT Profile color control ==============
 static uint8_t active_profile = 0;
+static bool usb_connected = false;
 
 void bagua_set_active_profile(uint8_t profile) {
     if (profile > 7) return;
     active_profile = profile;
+}
+
+void bagua_set_usb_connected(bool connected) {
+    usb_connected = connected;
 }
 
 // Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
@@ -315,7 +320,8 @@ void draw_bagua(void) {
     // Draw 8 trigrams: horizontal buffer -> rotate -> render
     // Active profile highlights the corresponding trigram; others in gray
     for (int i = 0; i < 8; i++) {
-        uint16_t tri_fg_color = (i == active_profile) ? profile_colors[i] : gray_color;
+        // 艮 (index 5) reflects USB status; others follow active profile
+    uint16_t tri_fg_color = (i == 5) ? (usb_connected ? profile_colors[5] : gray_color) : ((i == active_profile && i != 5) ? profile_colors[i] : gray_color);
         draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
         rotate_trigram(trigram_horiz, trigram_rot,
                        trigram_cos[i], trigram_sin[i]);
