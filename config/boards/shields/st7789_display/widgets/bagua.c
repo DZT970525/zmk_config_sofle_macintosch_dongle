@@ -204,7 +204,7 @@ static void draw_one_trigram(uint16_t cx, uint16_t cy, uint8_t pattern, uint16_t
 void draw_bagua(void) {
     if (!bagua_initialized) return;
 
-    uint16_t scale = 3;
+    uint16_t scale = 1;
     uint16_t tc_x = 120 - (TAICHI_W * scale / 2);
     uint16_t tc_y = 111 - (TAICHI_H * scale / 2);
 
@@ -229,7 +229,7 @@ void draw_bagua(void) {
 // ============== Init / lifecycle ==============
 
 void zmk_widget_bagua_init(void) {
-    size_t row_buf = TAICHI_W * 3 * TAICHI_H * 3;
+    size_t row_buf = TAICHI_W * scale * TAICHI_H * scale;
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
     bagua_initialized = true;
 }
