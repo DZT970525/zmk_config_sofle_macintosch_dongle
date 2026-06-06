@@ -134,21 +134,21 @@ typedef struct {
 } TriPos;
 
 static const TriPos trigrams[8] = {
-    {  0, -68, 0b101 }, // 上 S  - 离 LI   - 火 ╋━╋
+    {  0, -70, 0b101 }, // 上 S  - 离 LI   - 火 ╋━╋
 
-    {  48, -48, 0b111 }, // 右上 SW- 坤 KUN  - 地 ╋╋╋
+    {  50, -50, 0b111 }, // 右上 SW- 坤 KUN  - 地 ╋╋╋
 
-    {  68,   0, 0b100 }, // 右 W  - 兑 DUI  - 泽 ╋━━
+    {  70,   0, 0b100 }, // 右 W  - 兑 DUI  - 泽 ╋━━
 
-    {  48,  48, 0b000 }, // 右下 NW- 乾 QIAN - 天 ━━━
+    {  50,  50, 0b000 }, // 右下 NW- 乾 QIAN - 天 ━━━
 
-    {  0,   68, 0b010 }, // 下 N  - 坎 KAN  - 水 ━╋━
+    {  0,   70, 0b010 }, // 下 N  - 坎 KAN  - 水 ━╋━
 
-    { -48,  48, 0b011 }, // 左下 NE- 艮 GEN  - 山 ━╋╋
+    { -50,  50, 0b011 }, // 左下 NE- 艮 GEN  - 山 ━╋╋
 
-    { -68,   0, 0b110 }, // 左 E  - 震 ZHEN - 雷 ╋╋━
+    { -70,   0, 0b110 }, // 左 E  - 震 ZHEN - 雷 ╋╋━
 
-    { -48, -48, 0b001 }, // 左上 SE- 巽 XUN  - 风 ━━╋
+    { -50, -50, 0b001 }, // 左上 SE- 巽 XUN  - 风 ━━╋
 };
 
 // ============== Static state ==============
@@ -191,11 +191,14 @@ static const int16_t trigram_sin[8] = {
     0, 724, 1024, 724, 0, -724, -1024, -724
 };
 
-#define TMP_BUF_W 40
+#define TMP_BUF_W 38
 
-#define TMP_BUF_H 40
 
-#define TMP_RC 20
+#define TMP_BUF_H 38
+
+
+#define TMP_RC 19
+
 
 
 static uint16_t *trigram_horiz;
@@ -211,7 +214,7 @@ static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern) {
     int half_w = 11;
     int gap = 4;
     int thick = 3;
-    int spc = 7;
+    int spc = 6;
 
     for (int i = 0; i < 3; i++) {
         int ly = TMP_RC - 6 + i * (thick + spc);
