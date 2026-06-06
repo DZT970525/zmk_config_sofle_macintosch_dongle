@@ -131,6 +131,7 @@ uint16_t get_x(size_t label_len) {
 }
 
 void clear_last_printed_label() {
+    if (!last_printed_layer.label) return; 
     size_t len = strlen(last_printed_layer.label);
     uint16_t x = get_x(len);
     uint16_t y = get_y(len);
