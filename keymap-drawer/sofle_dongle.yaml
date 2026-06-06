@@ -63,7 +63,7 @@ layers:
   - SPACE
   - SPACE
   - {t: '#', h: toggle}
-  - {t: F, h: toggle}
+  - {t: F3, h: toggle}
   - KP PLUS
   - '-'
   - '*'
@@ -131,12 +131,12 @@ layers:
   - SPACE
   - SPACE
   - {t: '3', h: toggle}
-  - {t: F, h: toggle}
+  - {t: F3, h: toggle}
   - KP PLUS
   - KP MINUS
   - KP ASTERISK
   - KP DIVIDE
-  F:
+  F3:
   - '&bootloader'
   - ESC
   - F1
