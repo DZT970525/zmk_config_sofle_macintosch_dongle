@@ -169,7 +169,8 @@ void draw_bagua(void) {
 // ============== Init / lifecycle ==============
 
 void zmk_widget_bagua_init(void) {
-    size_t row_buf = TAICHI_W * scale * scale * 2;
+    uint16_t scale = 1;
+    size_t row_buf = TAICHI_W * scale * TAICHI_H * scale;
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
     bagua_initialized = true;
 }
