@@ -272,6 +272,24 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 
 
 
+// ============== BT Profile color control ==============
+static uint8_t active_profile = 0;
+
+void bagua_set_active_profile(uint8_t profile) {
+    if (profile > 4) return;
+    active_profile = profile;
+}
+
+// Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
+static const uint16_t profile_colors[5] = {
+    0xF800, // red
+    0xFFE0, // yellow
+    0x07E0, // green
+    0x07FF, // cyan
+    0xF81F  // magenta/purple
+};
+static const uint16_t gray_color = 0x8410; // inactive trigram color
+
 // ============== Main drawing function ==============
 
 void draw_bagua(void) {
@@ -292,7 +310,9 @@ void draw_bagua(void) {
                   fg, bg);
 
     // Draw 8 trigrams: horizontal buffer -> rotate -> render
+    // Active profile highlights the corresponding trigram; others in gray
     for (int i = 0; i < 8; i++) {
+        uint16_t tri_fg_color = (i < 5 && i == active_profile) ? profile_colors[i] : gray_color;
         draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
         rotate_trigram(trigram_horiz, trigram_rot,
                        trigram_cos[i], trigram_sin[i]);
@@ -301,7 +321,7 @@ void draw_bagua(void) {
         render_bitmap(trigram_rot, trigram_rot,
                       tx - TMP_RC, ty - TMP_RC,
                       TMP_BUF_W, TMP_BUF_H, 1,
-                      tri_fg, bg);
+                      tri_fg_color, bg);
     }
 
 }

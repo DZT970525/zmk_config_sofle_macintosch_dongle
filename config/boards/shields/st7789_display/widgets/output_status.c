@@ -282,6 +282,7 @@ void set_status_symbol() {
 
 void output_status_update_cb(struct output_status_state state) {
     status_state = state;
+    bagua_set_active_profile(state.active_profile_index);
     if (status_widget_initialized) {
         set_status_symbol();
     }
