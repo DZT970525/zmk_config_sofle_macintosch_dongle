@@ -127,7 +127,7 @@
         };
 
         raise_layer {
-            display-name = "F";
+            display-name = "F3";
             bindings = <
                                                                        &BOT
 &kp ESC     &kp F1    &kp F2     &kp F3     &kp F4     &bl BL_DEC  &bt BT_CLR                &kp C_MUTE                &bl BL_INC   &kp PRINTSCREEN       &none      &none       &none       &kp BACKSPACE
