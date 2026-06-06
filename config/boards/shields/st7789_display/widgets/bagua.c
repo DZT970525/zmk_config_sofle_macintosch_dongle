@@ -14,6 +14,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zephyr/device.h>
 #include <zephyr/drivers/display.h>
 #include <zmk/display.h>
+#include <zmk/event_manager.h>
+#include <zmk/events/layer_state_changed.h>
+#include <zmk/keymap.h>
 
 #include "bagua.h"
 #include "helpers/display.h"
@@ -203,6 +206,7 @@ static const int16_t trigram_sin[8] = {
 
 static uint16_t *trigram_horiz;
 static uint16_t *trigram_rot;
+static uint16_t *taichi_rotated;  // rotated Tai Chi buffer
 
 /**
  * Draw a horizontal trigram into the 1bpp temp buffer at buffer center.
@@ -250,6 +254,26 @@ static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern, bool half) {
  * Rotate src bitmap clockwise by angle θ (cos_a, sin_a in Q10) into dst.
  * Uses inverse mapping (CCW) with rounding to avoid pixel gaps.
  */
+/**
+ * Generic bitmap rotation for arbitrary size (used for Tai Chi).
+ */
+static void rotate_bitmap_generic(const uint16_t *src, uint16_t *dst,
+                                   uint16_t w, uint16_t h, uint16_t rc,
+                                   int16_t cos_a, int16_t sin_a) {
+    memset(dst, 0, w * h * sizeof(uint16_t));
+    for (int by = 0; by < h; by++) {
+        for (int bx = 0; bx < w; bx++) {
+            int dx = bx - rc;
+            int dy = by - rc;
+            int sx = rc + (dx * cos_a + dy * sin_a + 512) / 1024;
+            int sy = rc + (-dx * sin_a + dy * cos_a + 512) / 1024;
+            if (sx >= 0 && sx < (int)w && sy >= 0 && sy < (int)h) {
+                dst[by * w + bx] = src[sy * w + sx];
+            }
+        }
+    }
+}
+
 static void rotate_trigram(const uint16_t *src, uint16_t *dst,
                             int16_t cos_a, int16_t sin_a) {
     memset(dst, 0, TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
@@ -284,6 +308,7 @@ static bool blink_visible = true;
 static bool blink_active = false;
 static bool half_trigram = false;
 static struct k_work_delayable bagua_blink_work;
+static uint8_t active_layer = 0;
 
 static void bagua_blink_handler(struct k_work *work) {
     blink_visible = !blink_visible;
@@ -321,6 +346,18 @@ void bagua_set_profile_state(bool connected, bool bonded) {
     }
 }
 
+void bagua_set_layer(uint8_t layer) {
+    active_layer = layer;
+}
+
+static int bagua_layer_listener_cb(const zmk_event_t *eh) {
+    active_layer = zmk_keymap_highest_layer_active();
+    return 0;
+}
+
+ZMK_LISTENER(bagua_layer_status, bagua_layer_listener_cb);
+ZMK_SUBSCRIPTION(bagua_layer_status, zmk_layer_state_changed);
+
 // Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
 static const uint16_t profile_colors[8] = {
     0xF800, // red      - 离 (top)
@@ -347,8 +384,17 @@ void draw_bagua(void) {
     uint16_t bg = get_theme_font_bg_color();
     uint16_t tri_fg = get_theme_font_color();
 
-    // Draw Tai Chi (single call to render_bitmap with the full 30×30 array)
-    render_bitmap(scaled_bitmap_taichi, (uint16_t *)taichi_bitmap,
+    // Rotate Tai Chi based on active layer
+    // Layer 0(3)=0°, 1(#)=45°, 2(F)=90°, 3(M)=135°
+    static const int16_t layer_cos[4] = {1024, 724, 0, -724};
+    static const int16_t layer_sin[4] = {0, 724, 1024, 724};
+    uint8_t tc_angle_idx = (active_layer < 4) ? active_layer : 0;
+    
+    rotate_bitmap_generic(taichi_bitmap, taichi_rotated,
+                           TAICHI_W, TAICHI_H, TAICHI_H/2,
+                           layer_cos[tc_angle_idx], layer_sin[tc_angle_idx]);
+    
+    render_bitmap(scaled_bitmap_taichi, taichi_rotated,
                   tc_x, tc_y,
                   TAICHI_W, TAICHI_H, scale,
                   fg, bg);
@@ -386,6 +432,7 @@ void zmk_widget_bagua_init(void) {
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
     trigram_horiz = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
     trigram_rot = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
+    taichi_rotated = k_malloc(TAICHI_W * TAICHI_H * sizeof(uint16_t));
     k_work_init_delayable(&bagua_blink_work, bagua_blink_handler);
     bagua_initialized = true;
 }
