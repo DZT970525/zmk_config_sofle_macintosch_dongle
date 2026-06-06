@@ -38,7 +38,7 @@ SlotSide layer_slot_side = SLOT_SIDE_NONE;
 // Upper-left position — right next to the left battery bar
 static uint16_t layer_x = 25;
 static uint16_t layer_x_end = 115;
-static uint16_t layer_y = 10;
+static uint16_t layer_y = 12;
 static uint8_t label_limit = 100;
 
 typedef enum {
