@@ -122,7 +122,7 @@ static const uint16_t taichi_bitmap[] = {
 // and E→离(1,0,1), W→坎(0,1,1), SE→兑(1,0,0), NE→震(0,0,1),
 // NW→艮(1,1,0), SW→巽(0,1,0)
 
-// Ring radius from center (120, 111) in creative area (y=42~180)
+// Ring radius from center (120, 120) in creative area (y=42~180)
 #define RING_R 60
 #define CX_OFF 0
 #define CY_OFF 0
@@ -134,14 +134,14 @@ typedef struct {
 } TriPos;
 
 static const TriPos trigrams[8] = {
-    {  0, -54, 0b000 }, // S  - 乾 QIAN - Heaven (≡≡≡)
-    {  38, -38, 0b100 }, // SE - 兑 DUI  - Lake   (::≡)
-    {  54,   0, 0b101 }, // E  - 离 LI   - Fire   (:::)
-    {  38,  38, 0b001 }, // NE - 震 ZHEN - Thunder (≡≡:)
-    {  0,   54, 0b111 }, // N  - 坤 KUN  - Earth  (:::)
-    { -38,  38, 0b011 }, // NW - 艮 GEN  - Mountain (≡::)
-    { -54,   0, 0b110 }, // W  - 坎 KAN  - Water  (::≡)
-    { -38, -38, 0b010 }, // SW - 巽 XUN  - Wind   (:≡:)
+    {  0, -63, 0b000 }, // S  - 乾 QIAN - Heaven (≡≡≡)
+    {  45, -45, 0b100 }, // SE - 兑 DUI  - Lake   (::≡)
+    {  63,   0, 0b101 }, // E  - 离 LI   - Fire   (:::)
+    {  45,  45, 0b001 }, // NE - 震 ZHEN - Thunder (≡≡:)
+    {  0,   63, 0b111 }, // N  - 坤 KUN  - Earth  (:::)
+    { -45,  45, 0b011 }, // NW - 艮 GEN  - Mountain (≡::)
+    { -63,   0, 0b110 }, // W  - 坎 KAN  - Water  (::≡)
+    { -45, -45, 0b010 }, // SW - 巽 XUN  - Wind   (:≡:)
 };
 
 // ============== Static state ==============
@@ -173,28 +173,86 @@ static void draw_v_bar(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t 
 /**
  * Draw one trigram: 3 horizontal lines at (cx, cy).
  * pattern: 3-bit (MSB=top, LSB=bottom, 0=solid ---, 1=broken - -)
- */
-static void draw_one_trigram(uint16_t cx, uint16_t cy, uint8_t pattern, uint16_t fg, uint16_t bg) {
-    uint16_t half_w = 9;  // 14px total width
-    uint16_t gap = 3;     // gap in broken lines
-    uint16_t thick = 3;   // line thickness
-    uint16_t spc = 6;     // space between lines
+// ============== Trigram rotation ==============
+// Rotate trigram so top points outward along radial direction
+// Q10 fixed-point (1024 = 1.0)
+static const int16_t trigram_cos[8] = {
+    1024, 724, 0, -724, -1024, -724, 0, 724
+};
+static const int16_t trigram_sin[8] = {
+    0, 724, 1024, 724, 0, -724, -1024, -724
+};
 
-    (void)bg;
+#define TMP_BUF_W 36
+#define TMP_BUF_H 36
+#define TMP_RC 18
+
+static uint16_t *trigram_horiz;
+static uint16_t *trigram_rot;
+
+/**
+ * Draw a horizontal trigram into the 1bpp temp buffer at buffer center.
+ * 0 = transparent, 1 = foreground pixel
+ */
+static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern) {
+    memset(buf, 0, TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
+
+    int half_w = 11;
+    int gap = 4;
+    int thick = 3;
+    int spc = 7;
 
     for (int i = 0; i < 3; i++) {
-        uint16_t ly = cy - 6 + i * (thick + spc);
-        if (ly < 42 || ly > 178) continue;
-
+        int ly = TMP_RC - 6 + i * (thick + spc);
         uint8_t bit = (pattern >> (2 - i)) & 1;
+
         if (bit == 0) {
-            // Solid line: ---
-            draw_h_line(cx - half_w, ly, half_w * 2, thick, fg);
+            for (int yy = ly; yy < ly + thick; yy++) {
+                for (int xx = TMP_RC - half_w; xx < TMP_RC + half_w; xx++) {
+                    if (xx >= 0 && xx < TMP_BUF_W && yy >= 0 && yy < TMP_BUF_H)
+                        buf[yy * TMP_BUF_W + xx] = 1;
+                }
+            }
         } else {
-            // Broken line: - -
-            uint16_t seg_w = half_w - gap;
-            draw_h_line(cx - half_w, ly, seg_w, thick, fg);
-            if (seg_w > 0) draw_h_line(cx + gap, ly, seg_w, thick, fg);
+            int seg_w = half_w - gap;
+            for (int yy = ly; yy < ly + thick; yy++) {
+                for (int xx = TMP_RC - half_w; xx < TMP_RC - half_w + seg_w; xx++) {
+                    if (xx >= 0 && xx < TMP_BUF_W && yy >= 0 && yy < TMP_BUF_H)
+                        buf[yy * TMP_BUF_W + xx] = 1;
+                }
+                for (int xx = TMP_RC + gap; xx < TMP_RC + gap + seg_w; xx++) {
+                    if (xx >= 0 && xx < TMP_BUF_W && yy >= 0 && yy < TMP_BUF_H)
+                        buf[yy * TMP_BUF_W + xx] = 1;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Rotate src bitmap clockwise by angle θ (cos_a, sin_a in Q10) into dst.
+ * Uses inverse mapping (CCW) with rounding to avoid pixel gaps.
+ */
+static void rotate_trigram(const uint16_t *src, uint16_t *dst,
+                            int16_t cos_a, int16_t sin_a) {
+    memset(dst, 0, TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
+
+    for (int by = 0; by < TMP_BUF_H; by++) {
+        for (int bx = 0; bx < TMP_BUF_W; bx++) {
+            int dx = bx - TMP_RC;
+            int dy = by - TMP_RC;
+
+            int sx = TMP_RC + (dx * cos_a - dy * sin_a + 512) / 1024;
+            int sy = TMP_RC + (dx * sin_a + dy * cos_a + 512) / 1024;
+
+            if (sx >= 0 && sx < TMP_BUF_W && sy >= 0 && sy < TMP_BUF_H) {
+                dst[by * TMP_BUF_W + bx] = src[sy * TMP_BUF_W + sx];
+            }
+        }
+    }
+}
+
+
         }
     }
 }
@@ -206,7 +264,7 @@ void draw_bagua(void) {
 
     uint16_t scale = 1;
     uint16_t tc_x = 120 - (TAICHI_W * scale / 2);
-    uint16_t tc_y = 111 - (TAICHI_H * scale / 2);
+    uint16_t tc_y = 120 - (TAICHI_H * scale / 2);
 
     uint16_t fg = get_theme_font_color();
     uint16_t bg = get_theme_font_bg_color();
@@ -218,12 +276,19 @@ void draw_bagua(void) {
                   TAICHI_W, TAICHI_H, scale,
                   fg, bg);
 
-    // Draw 8 trigrams in a ring
+    // Draw 8 trigrams: horizontal buffer -> rotate -> render
     for (int i = 0; i < 8; i++) {
+        draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
+        rotate_trigram(trigram_horiz, trigram_rot,
+                       trigram_cos[i], trigram_sin[i]);
         uint16_t tx = 120 + trigrams[i].dx;
-        uint16_t ty = 111 + trigrams[i].dy;
-        draw_one_trigram(tx, ty, trigrams[i].pattern, tri_fg, bg);
+        uint16_t ty = 120 + trigrams[i].dy;
+        render_bitmap(trigram_rot, trigram_rot,
+                      tx - TMP_RC, ty - TMP_RC,
+                      TMP_BUF_W, TMP_BUF_H, 1,
+                      tri_fg, bg);
     }
+
 }
 
 // ============== Init / lifecycle ==============
@@ -231,6 +296,8 @@ void draw_bagua(void) {
 void zmk_widget_bagua_init(void) {
     size_t row_buf = TAICHI_W * TAICHI_H;
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
+    trigram_horiz = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
+    trigram_rot = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
     bagua_initialized = true;
 }
 
