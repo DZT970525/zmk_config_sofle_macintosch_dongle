@@ -39,19 +39,26 @@ static const uint16_t single_battery_offset = 60;
 static const uint16_t font_offset = 2;
 #endif
 
+// Use smaller font scale for percentage text that sits next to bars
 #ifdef CONFIG_USE_BATTERY_FONT_3X5
-static const uint16_t scale = 10;
+static const uint16_t scale = 5;
 static const uint16_t font_width = 3;
 static const uint16_t font_height = 5;
 #else
-static const uint16_t scale = 6;
+static const uint16_t scale = 4;
 static const uint16_t font_width = 5;
 static const uint16_t font_height = 8;
 #endif
 
-static const uint16_t start_x_peripheral_1 = 12;
-static const uint16_t start_x_peripheral_2 = 132;
-static const uint16_t start_y = 176;
+// Percentage text positions (next to the bars)
+static const uint16_t start_x_peripheral_1 = 7;
+static const uint16_t start_x_peripheral_2 = 210;
+static const uint16_t start_y = 210;
+
+// --- Vertical battery bar (serves as screen side frame) ---
+#define BAR_W 5
+#define BAR_H 240
+static uint8_t *buf_bar;
 
 struct peripheral_battery_state {
     uint8_t source;
@@ -120,17 +127,57 @@ void print_percentage(uint8_t digit, uint16_t x, uint16_t y, uint16_t scale, uin
 #endif
 }
 
+static uint16_t bar_fill_color_for_level(uint8_t level, bool is_left) {
+    if (level > 60) {
+        return is_left ? get_battery_num_color() : get_battery_num_color_1();
+    } else if (level > 30) {
+        return is_left ? get_battery_percentage_color() : get_battery_percentage_color_1();
+    }
+    return 0xF800; // red for low battery
+}
+
+static uint16_t bar_bg_color_for_side(bool is_left) {
+    return is_left ? get_battery_bg_color() : get_battery_bg_color_1();
+}
+
+static void draw_one_bar(uint8_t level, uint16_t x_pos, bool is_left) {
+    uint16_t filled_h = ((uint16_t)level * BAR_H) / 100;
+    if (filled_h > BAR_H) filled_h = BAR_H;
+    uint16_t empty_h = BAR_H - filled_h;
+
+    uint16_t fill_color = bar_fill_color_for_level(level, is_left);
+    uint16_t bg_color = bar_bg_color_for_side(is_left);
+
+    // Fill entire bar with bg color
+    fill_buffer_color(buf_bar, BAR_W * BAR_H * 2, bg_color);
+
+    // Overwrite bottom portion with battery level color
+    if (filled_h > 0) {
+        fill_buffer_color(buf_bar + (empty_h * BAR_W * 2),
+                         filled_h * BAR_W * 2, fill_color);
+    }
+
+    render_filled_rectangle(buf_bar, x_pos, 0, BAR_W, BAR_H);
+}
+
+static void draw_battery_bars(void) {
+    draw_one_bar(battery_state_0.level, 0, true);
+    draw_one_bar(battery_state_1.level, 240 - BAR_W, false);
+}
+
 void set_battery_symbol() {
+    draw_battery_bars();
+
 #ifdef CONFIG_SHOW_SINGLE_BATTERY
     print_percentage(battery_state_0.level, start_x_peripheral_1 + single_battery_offset, start_y,
                      scale, get_battery_num_color(), get_battery_bg_color(),
                      get_battery_percentage_color());
 #else
-    print_percentage(battery_state_0.level, start_x_peripheral_1, start_y, scale,
-                     get_battery_num_color(), get_battery_bg_color(),
+    print_percentage(battery_state_0.level, start_x_peripheral_1, start_y,
+                     scale, get_battery_num_color(), get_battery_bg_color(),
                      get_battery_percentage_color());
-    print_percentage(battery_state_1.level, start_x_peripheral_2, start_y, scale,
-                     get_battery_num_color_1(), get_battery_bg_color_1(),
+    print_percentage(battery_state_1.level, start_x_peripheral_2, start_y,
+                     scale, get_battery_num_color_1(), get_battery_bg_color_1(),
                      get_battery_percentage_color_1());
 #endif
 }
@@ -177,8 +224,11 @@ void print_empty_batteries() {
 
 void zmk_widget_peripheral_battery_status_init() {
     uint16_t bitmap_size = (font_width * scale) * (font_height * scale);
-
     scaled_bitmap_1 = k_malloc(bitmap_size * 2 * sizeof(uint16_t));
+
+    // Init bar buffer
+    buf_bar = k_malloc(BAR_W * BAR_H * 2);
+    fill_buffer_color(buf_bar, BAR_W * BAR_H * 2, 0x0000);
 
     widget_battery_status_init();
 }
@@ -186,7 +236,10 @@ void zmk_widget_peripheral_battery_status_init() {
 void initialize_battery_status() { battery_widget_initialized = true; }
 
 void start_battery_status() {
-    print_empty_batteries();
+    // Draw bars and empty percentages on first start
+    battery_state_0.level = 0;
+    battery_state_1.level = 0;
+    set_battery_symbol();
     battery_widget_running = true;
 }
 
