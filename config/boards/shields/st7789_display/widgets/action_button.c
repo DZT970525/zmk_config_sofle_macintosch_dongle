@@ -35,6 +35,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "wpm.h"
 // #include "snake_image.h"
 #include "logo.h"
+#include "bagua.h"
 #include <stdint.h>
 
 static uint8_t *buf_frame;
@@ -74,39 +75,21 @@ void print_container(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint1
 
 void print_frames() {
     uint16_t thickness = 3;
-    // logo frame
-    print_container(buf_frame, 0, 240, 0, 101, thickness);
-
-    // status frames
-    print_container(buf_frame, 0, 120, 100, 161, thickness);
-
-    // theme frames
-    print_container(buf_frame, 120, 240, 100, 161, thickness);
-
-// battery frames
-#ifdef CONFIG_SHOW_SINGLE_BATTERY
-    print_container(buf_frame, 0, 240, 160, 240, thickness);
-#else
-    print_container(buf_frame, 0, 120, 160, 240, thickness);
-    print_container(buf_frame, 120, 240, 160, 240, thickness);
-#endif
+    // Single outer frame only — battery bars serve as side borders
+    print_container(buf_frame, 0, 240, 0, 240, thickness);
 }
 
 void print_menu() {
     clear_screen();
-    start_animation();
+    start_bagua();
     print_frames();
     start_battery_status();
     start_output_status();
-    start_wpm_status();
-    start_modifier_status();
     start_layer_status();
     set_status_symbol();
     set_battery_symbol();
     print_layer();
     print_themes();
-    print_wpm();
-    print_modifiers();
 }
 
 void toggle_menu() {
@@ -120,7 +103,7 @@ void toggle_menu() {
         stop_modifier_status();
         stop_output_status();
         stop_battery_status();
-        stop_animation();
+        stop_bagua();
         stop_layer_status();
         start_snake();
         menu_on = false;
