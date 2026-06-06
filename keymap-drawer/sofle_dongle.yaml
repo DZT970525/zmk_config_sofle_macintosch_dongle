@@ -232,7 +232,7 @@ layers:
   - ''
   - ''
   - ''
-  - CAPS
+  - LSHFT
   - A
   - S
   - D
@@ -246,7 +246,7 @@ layers:
   - ''
   - ''
   - ''
-  - LSHFT
+  - LCTRL
   - Z
   - X
   - C
@@ -262,9 +262,9 @@ layers:
   - '&msc SCRL_UP'
   - ''
   - ''
-  - LCTRL
-  - LGUI
+  - LCMD
   - LALT
+  - SPACE
   - SPACE
   - {t: '4', h: toggle}
   - {t: '4', h: toggle}
