@@ -163,7 +163,7 @@ static void layer_status_update_cb(struct layer_status_state state) {
     }
 }
 
-static  layer_status_get_state(const zmk_event_t *eh) {
+static  struct layer_status_state layer_status_get_state(const zmk_event_t *eh) {
     uint8_t index = zmk_keymap_highest_layer_active();
     return (struct layer_status_state){.index = index, .label = zmk_keymap_layer_name(index)};
 }
