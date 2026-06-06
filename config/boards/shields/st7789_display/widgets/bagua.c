@@ -283,6 +283,12 @@ void draw_bagua(void) {
     uint16_t bg = get_theme_font_bg_color();
     uint16_t tri_fg = get_theme_font_color();
 
+    // Draw Tai Chi (single call to render_bitmap with the full 30×30 array)
+    render_bitmap(scaled_bitmap_taichi, (uint16_t *)taichi_bitmap,
+                  tc_x, tc_y,
+                  TAICHI_W, TAICHI_H, scale,
+                  fg, bg);
+
     // Draw 8 trigrams: horizontal buffer -> rotate -> render
     for (int i = 0; i < 8; i++) {
         draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
@@ -295,12 +301,6 @@ void draw_bagua(void) {
                       TMP_BUF_W, TMP_BUF_H, 1,
                       tri_fg, bg);
     }
-
-    // Draw Tai Chi (single call to render_bitmap with the full 30×30 array)
-    render_bitmap(scaled_bitmap_taichi, (uint16_t *)taichi_bitmap,
-                  tc_x, tc_y,
-                  TAICHI_W, TAICHI_H, scale,
-                  fg, bg);
 
 }
 
