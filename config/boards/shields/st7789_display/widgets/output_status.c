@@ -274,7 +274,8 @@ void print_symbols(uint16_t usb_x, uint16_t ble_x, uint16_t y, struct output_sta
 }
 
 void set_status_symbol() {
-    print_bluetooth_profiles(bluetooth_profiles_x, bluetooth_profiles_y, status_state);
+    // Profile number display removed - color indicates active profile via bagua
+
     print_bluetooth_status(bluetooth_status_x, bluetooth_status_y, status_state);
     print_symbols(symbol_usb_x, symbol_ble_x, symbols_y, status_state);
 }
@@ -299,7 +300,8 @@ void zmk_widget_output_status_init() {
 
     uint16_t bitmap_size_bt_num = (bt_num_width * bt_num_scale) * (bt_num_height * bt_num_scale);
 
-    scaled_bitmap_bt_num = k_malloc(bitmap_size_bt_num * 2 * sizeof(uint16_t));
+    // bt_num display removed
+
 
     uint16_t bitmap_size_status = (status_width * status_scale) * (status_height * status_scale);
 
