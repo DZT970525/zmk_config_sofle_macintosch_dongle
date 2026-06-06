@@ -18,6 +18,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <stdio.h>
 #include <string.h>
 
+struct layer_status_state {
+    uint8_t index;
+    const char *label;
+};
+
 static bool layer_widget_running = false;
 
 static struct layer_status_state current_layer;
@@ -151,14 +156,14 @@ void print_layer() {
     last_printed_layer = current_layer;
 }
 
-static void layer_status_update_cb(struct layer_status_state state) {
+static void layer_status_update_cb( state) {
     current_layer = state;
     if (layer_widget_running) {
         print_layer();
     }
 }
 
-static struct layer_status_state layer_status_get_state(const zmk_event_t *eh) {
+static  layer_status_get_state(const zmk_event_t *eh) {
     uint8_t index = zmk_keymap_highest_layer_active();
     return (struct layer_status_state){.index = index, .label = zmk_keymap_layer_name(index)};
 }
