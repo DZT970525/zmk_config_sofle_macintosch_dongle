@@ -282,11 +282,11 @@ void bagua_set_active_profile(uint8_t profile) {
 
 // Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
 static const uint16_t profile_colors[5] = {
-    0xF800, // red
-    0xFFE0, // yellow
-    0x07E0, // green
-    0x07FF, // cyan
-    0xF81F  // magenta/purple
+    0xF800, // red      - 离 (top)
+    0xFFE0, // yellow   - 坤 (upper-right)
+    0xFFFF, // white    - 兑 (right)
+    0xFEC0, // gold     - 乾 (lower-right)
+    0x001F  // blue     - 坎 (bottom)
 };
 static const uint16_t gray_color = 0x8410; // inactive trigram color
 
