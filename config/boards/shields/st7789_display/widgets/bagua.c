@@ -123,7 +123,7 @@ static const uint16_t taichi_bitmap[] = {
 // NW→艮(1,1,0), SW→巽(0,1,0)
 
 // Ring radius from center (120, 111) in creative area (y=42~180)
-#define RING_R 54
+#define RING_R 60
 #define CX_OFF 0
 #define CY_OFF 0
 
@@ -149,7 +149,7 @@ static uint16_t *scaled_bitmap_taichi;
 static bool bagua_initialized = false;
 
 // Scratch buffer for drawing small horizontal line segments (trigrams)
-#define LINE_BUF_W 16
+#define LINE_BUF_W 24
 #define LINE_BUF_H 2
 static uint8_t line_buf[LINE_BUF_W * LINE_BUF_H * 2];
 static uint8_t line_big_buf[256 * 8 * 2]; // for larger fills
@@ -175,10 +175,10 @@ static void draw_v_bar(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t 
  * pattern: 3-bit (MSB=top, LSB=bottom, 0=solid ---, 1=broken - -)
  */
 static void draw_one_trigram(uint16_t cx, uint16_t cy, uint8_t pattern, uint16_t fg, uint16_t bg) {
-    uint16_t half_w = 7;  // 14px total width
+    uint16_t half_w = 9;  // 14px total width
     uint16_t gap = 3;     // gap in broken lines
-    uint16_t thick = 2;   // line thickness
-    uint16_t spc = 5;     // space between lines
+    uint16_t thick = 3;   // line thickness
+    uint16_t spc = 6;     // space between lines
 
     (void)bg;
 
