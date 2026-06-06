@@ -254,9 +254,6 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 }
 
 
-        }
-    }
-}
 
 // ============== Main drawing function ==============
 
