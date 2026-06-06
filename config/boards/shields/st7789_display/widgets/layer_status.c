@@ -156,7 +156,7 @@ void print_layer() {
     last_printed_layer = current_layer;
 }
 
-static void layer_status_update_cb( state) {
+static void layer_status_update_cb(struct layer_status_state state) {
     current_layer = state;
     if (layer_widget_running) {
         print_layer();
