@@ -127,13 +127,19 @@ void print_percentage(uint8_t digit, uint16_t x, uint16_t y, uint16_t scale, uin
 #endif
 }
 
-static uint16_t bar_fill_color_for_level(uint8_t level, bool is_left) {
-    if (level > 60) {
-        return is_left ? get_battery_num_color() : get_battery_num_color_1();
-    } else if (level > 30) {
-        return is_left ? get_battery_percentage_color() : get_battery_percentage_color_1();
+static uint16_t bar_fill_color_for_level(uint8_t level) {
+    // Gradient: 0% = dark red, 5% = red, 100% = green
+    if (level >= 100) return 0x07E0; // green
+    if (level > 5) {
+        uint8_t t = (level - 5) * 255 / 95; // 0..255
+        uint8_t r = (31 * (255 - t)) / 255; // 31→0
+        uint8_t g = (63 * t) / 255;         // 0→63
+        return (r << 11) | (g << 5);
     }
-    return 0xF800; // red for low battery
+    // 0-5%: dark red → red
+    uint8_t t = level * 255 / 5;
+    uint8_t r = 16 + (15 * t) / 255; // 16→31
+    return (r << 11);
 }
 
 static uint16_t bar_bg_color_for_side(bool is_left) {
@@ -145,7 +151,7 @@ static void draw_one_bar(uint8_t level, uint16_t x_pos, bool is_left) {
     if (filled_h > BAR_H) filled_h = BAR_H;
     uint16_t empty_h = BAR_H - filled_h;
 
-    uint16_t fill_color = bar_fill_color_for_level(level, is_left);
+    uint16_t fill_color = bar_fill_color_for_level(level);
     uint16_t bg_color = bar_bg_color_for_side(is_left);
 
     // Fill entire bar with bg color
