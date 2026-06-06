@@ -44,10 +44,7 @@ typedef enum {
     FONT_5,
 } LAYER_FONT;
 
-struct layer_status_state {
-    uint8_t index;
-    const char *label;
-};
+
 
 LAYER_FONT get_font(size_t label_len) {
 
