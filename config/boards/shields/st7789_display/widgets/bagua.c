@@ -276,17 +276,20 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 static uint8_t active_profile = 0;
 
 void bagua_set_active_profile(uint8_t profile) {
-    if (profile > 4) return;
+    if (profile > 7) return;
     active_profile = profile;
 }
 
 // Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
-static const uint16_t profile_colors[5] = {
+static const uint16_t profile_colors[8] = {
     0xF800, // red      - 离 (top)
     0xFFE0, // yellow   - 坤 (upper-right)
     0xFFFF, // white    - 兑 (right)
     0xFEC0, // gold     - 乾 (lower-right)
-    0x001F  // blue     - 坎 (bottom)
+    0x001F, // blue     - 坎 (bottom)
+    0xFD20, // orange   - 艮 (lower-left)
+    0xF81F, // purple   - 震 (left)
+    0x07FF  // cyan     - 巽 (upper-left)
 };
 static const uint16_t gray_color = 0x8410; // inactive trigram color
 
@@ -312,7 +315,7 @@ void draw_bagua(void) {
     // Draw 8 trigrams: horizontal buffer -> rotate -> render
     // Active profile highlights the corresponding trigram; others in gray
     for (int i = 0; i < 8; i++) {
-        uint16_t tri_fg_color = (i < 5 && i == active_profile) ? profile_colors[i] : gray_color;
+        uint16_t tri_fg_color = (i == active_profile) ? profile_colors[i] : gray_color;
         draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
         rotate_trigram(trigram_horiz, trigram_rot,
                        trigram_cos[i], trigram_sin[i]);
