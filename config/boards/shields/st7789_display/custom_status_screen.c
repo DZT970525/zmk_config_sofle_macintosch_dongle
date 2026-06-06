@@ -13,7 +13,7 @@
 #include "widgets/action_button.h"
 #include "widgets/logo.h"
 #include "widgets/configuration.h"
-#include "widgets/wpm.h"
+// #include "widgets/wpm.h"
 #include "widgets/modifier.h"
 #include <zmk/activity.h>
 #include <zmk/events/activity_state_changed.h>
@@ -79,7 +79,7 @@ lv_obj_t *zmk_display_status_screen() {
     zmk_widget_layer_init();
     start_layer_status();
     zmk_widget_action_button_init();
-    zmk_widget_wpm_init();
+        // zmk_widget_wpm_init();
     zmk_widget_modifier_init();
 
     // 启动开机 splash 动画
