@@ -213,7 +213,7 @@ void print_bitmap_status(uint16_t *scaled_bitmap, Status s, uint16_t x, uint16_t
                       bg_color);
         break;
     default:
-        render_bitmap(scaled_bitmap, none, x, y, 4, 6, scale, color, bg_color);
+        render_bitmap(scaled_bitmap, none, x, y, 12, 12, scale, color, bg_color);
     }
 }
 
