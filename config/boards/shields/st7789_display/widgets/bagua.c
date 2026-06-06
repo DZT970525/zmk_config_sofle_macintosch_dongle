@@ -134,21 +134,21 @@ typedef struct {
 } TriPos;
 
 static const TriPos trigrams[8] = {
-    {  0, -72, 0b101 }, // 上 S  - 离 LI   - 火 ╋━╋
+    {  0, -70, 0b101 }, // 上 S  - 离 LI   - 火 ╋━╋
 
-    {  51, -51, 0b111 }, // 右上 SW- 坤 KUN  - 地 ╋╋╋
+    {  50, -50, 0b111 }, // 右上 SW- 坤 KUN  - 地 ╋╋╋
 
-    {  72,   0, 0b100 }, // 右 W  - 兑 DUI  - 泽 ╋━━
+    {  70,   0, 0b100 }, // 右 W  - 兑 DUI  - 泽 ╋━━
 
-    {  51,  51, 0b000 }, // 右下 NW- 乾 QIAN - 天 ━━━
+    {  50,  50, 0b000 }, // 右下 NW- 乾 QIAN - 天 ━━━
 
-    {  0,   72, 0b010 }, // 下 N  - 坎 KAN  - 水 ━╋━
+    {  0,   70, 0b010 }, // 下 N  - 坎 KAN  - 水 ━╋━
 
-    { -51,  51, 0b011 }, // 左下 NE- 艮 GEN  - 山 ━╋╋
+    { -50,  50, 0b011 }, // 左下 NE- 艮 GEN  - 山 ━╋╋
 
-    { -72,   0, 0b110 }, // 左 E  - 震 ZHEN - 雷 ╋╋━
+    { -70,   0, 0b110 }, // 左 E  - 震 ZHEN - 雷 ╋╋━
 
-    { -51, -51, 0b001 }, // 左上 SE- 巽 XUN  - 风 ━━╋
+    { -50, -50, 0b001 }, // 左上 SE- 巽 XUN  - 风 ━━╋
 };
 
 // ============== Static state ==============
@@ -316,22 +316,6 @@ static const uint16_t profile_colors[8] = {
     0x07FF  // cyan     - 巽 (upper-left)
 };
 static const uint16_t gray_color = 0x8410; // inactive trigram color
-static bool usb_connected = false;
-static bool num_lock_on = false;
-static bool profile_connected = false;
-static bool profile_bonded = false;
-static bool blink_visible = true;
-static bool blink_active = false;
-static bool half_trigram = false;
-static struct k_work_delayable bagua_blink_work;
-
-static void bagua_blink_handler(struct k_work *work) {
-    blink_visible = !blink_visible;
-    draw_bagua();
-    if (blink_active) {
-        k_work_schedule(&bagua_blink_work, K_MSEC(500));
-    }
-}
 
 // ============== Main drawing function ==============
 
