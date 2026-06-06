@@ -208,7 +208,8 @@ static uint16_t *trigram_rot;
  * Draw a horizontal trigram into the 1bpp temp buffer at buffer center.
  * 0 = transparent, 1 = foreground pixel
  */
-static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern) {
+static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern, bool half) {
+
     memset(buf, 0, TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
 
     int half_w = 11;
@@ -292,6 +293,7 @@ static const uint16_t profile_colors[8] = {
     0x07FF  // cyan     - 巽 (upper-left)
 };
 static const uint16_t gray_color = 0x8410; // inactive trigram color
+static uint16_t dim_color = 0x8410; // half-bright active color (computed from profile color)
 
 // ============== Main drawing function ==============
 
@@ -316,7 +318,7 @@ void draw_bagua(void) {
     // Active profile highlights the corresponding trigram; others in gray
     for (int i = 0; i < 8; i++) {
         uint16_t tri_fg_color = (i == active_profile) ? profile_colors[i] : gray_color;
-        draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern);
+        draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern, half_trigram && i == active_profile);
         rotate_trigram(trigram_horiz, trigram_rot,
                        trigram_cos[i], trigram_sin[i]);
         uint16_t tx = 120 + trigrams[i].dx;
