@@ -42,7 +42,7 @@ static const uint16_t symbol_height = 12;
 
 static const uint16_t bt_num_scale = 3;
 static const uint16_t bt_num_width = 5;
-static const uint16_t bt_num_height = 7;
+static const uint16_t bt_num_height = 8;
 
 // Upper-right corner positions (next to right battery bar)
 static uint16_t bluetooth_profiles_x = 172;
@@ -244,11 +244,11 @@ void print_bluetooth_status(uint16_t x, uint16_t y, struct output_status_state s
 void print_bluetooth_profile(uint16_t x, uint16_t y, int active_profile) {
     if (active_profile < 0 || active_profile > 4) {
         print_bitmap(scaled_bitmap_bt_num, CHAR_NONE, x, y, bt_num_scale, get_bt_num_color(),
-                     get_bt_bg_color(), FONT_SIZE_5x7);
+                     get_bt_bg_color(), FONT_SIZE_5x8);
         return;
     }
     print_bitmap(scaled_bitmap_bt_num, active_profile + 1, x, y, bt_num_scale, get_bt_num_color(),
-                 get_bt_bg_color(), FONT_SIZE_5x7);
+                 get_bt_bg_color(), FONT_SIZE_5x8);
 }
 
 void print_bluetooth_profiles(uint16_t x, uint16_t y, struct output_status_state state) {
