@@ -173,6 +173,7 @@ static void draw_v_bar(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t 
 /**
  * Draw one trigram: 3 horizontal lines at (cx, cy).
  * pattern: 3-bit (MSB=top, LSB=bottom, 0=solid ---, 1=broken - -)
+ */
 // ============== Trigram rotation ==============
 // Rotate trigram so top points outward along radial direction
 // Q10 fixed-point (1024 = 1.0)
