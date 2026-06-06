@@ -45,12 +45,12 @@ static const uint16_t bt_num_width = 5;
 static const uint16_t bt_num_height = 8;
 
 // Upper-right corner positions (next to right battery bar)
-static uint16_t bluetooth_profiles_x = 172;
+static uint16_t bluetooth_profiles_x = 180;
 static uint16_t bluetooth_profiles_y = 12;
-static uint16_t bluetooth_status_x = 194;
+static uint16_t bluetooth_status_x = 204;
 static uint16_t bluetooth_status_y = 12;
 static uint16_t symbol_usb_x = 132;
-static uint16_t symbol_ble_x = 152;
+static uint16_t symbol_ble_x = 156;
 static uint16_t symbols_y = 12;
 
 static const uint16_t usb_ready_bitmap[] = {
