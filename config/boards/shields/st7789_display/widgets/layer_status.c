@@ -29,9 +29,11 @@ static uint16_t layer_font_height = 5;
 static uint16_t *scaled_bitmap_layer_font;
 
 SlotSide layer_slot_side = SLOT_SIDE_NONE;
-static uint16_t layer_x = 120;
-static uint16_t layer_x_end = 120;
-static uint16_t layer_y = 30;
+
+// Upper-left position — right next to the left battery bar
+static uint16_t layer_x = 25;
+static uint16_t layer_x_end = 115;
+static uint16_t layer_y = 10;
 static uint8_t label_limit = 100;
 
 typedef enum {
@@ -119,7 +121,7 @@ uint16_t get_gap(size_t label_len) {
 }
 
 uint16_t get_x(size_t label_len) {
-    uint16_t available_pixels = layer_x_end - layer_x; // 112
+    uint16_t available_pixels = layer_x_end - layer_x; // 90
     uint16_t total_width =
         ((get_scale(label_len) * layer_font_width) + get_gap(label_len)) * label_len;
     uint16_t offset = (available_pixels - total_width) / 2;
@@ -137,9 +139,6 @@ void clear_last_printed_label() {
 }
 
 void print_layer() {
-    /*if (layer_slot_side == SLOT_SIDE_NONE) {
-        return;
-    } */
     clear_last_printed_label();
 
     size_t len = strlen(current_layer.label);
@@ -178,12 +177,6 @@ void zmk_widget_layer_init() {
     scaled_bitmap_layer_font = k_malloc(layer_font_size * 2 * sizeof(uint16_t));
     last_printed_layer = (struct layer_status_state){.index = 0, .label = '\0'};
 
-    /* layer_slot_side = get_slot_to_print(INFO_SLOT_LAYER);
-     if (layer_slot_side == SLOT_SIDE_RIGHT) {
-         layer_x += 120;
-         layer_x_end += 120;
-     }
- */
     widget_layer_status_init();
 }
 
