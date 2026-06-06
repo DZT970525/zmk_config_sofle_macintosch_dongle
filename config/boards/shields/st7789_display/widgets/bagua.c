@@ -184,9 +184,12 @@ static const int16_t trigram_sin[8] = {
     0, 724, 1024, 724, 0, -724, -1024, -724
 };
 
-#define TMP_BUF_W 36
-#define TMP_BUF_H 36
-#define TMP_RC 18
+#define TMP_BUF_W 40
+
+#define TMP_BUF_H 40
+
+#define TMP_RC 20
+
 
 static uint16_t *trigram_horiz;
 static uint16_t *trigram_rot;
