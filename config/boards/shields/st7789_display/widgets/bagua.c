@@ -209,7 +209,6 @@ static uint16_t *trigram_rot;
  * 0 = transparent, 1 = foreground pixel
  */
 static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern, bool half) {
-
     memset(buf, 0, TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
 
     int half_w = 11;
@@ -218,6 +217,7 @@ static void draw_one_trigram_horiz(uint16_t *buf, uint8_t pattern, bool half) {
     int spc = 6;
 
     for (int i = 0; i < 3; i++) {
+        if (half && i == 1) continue;  // half trigram: skip middle line
         int ly = TMP_RC - 6 + i * (thick + spc);
 
 
@@ -275,6 +275,47 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 
 // ============== BT Profile color control ==============
 static uint8_t active_profile = 0;
+
+void bagua_set_active_profile(uint8_t profile) {
+    if (profile > 7) return;
+    active_profile = profile;
+}
+
+void bagua_set_usb_connected(bool connected) {
+    usb_connected = connected;
+}
+
+void bagua_set_num_lock(bool on) {
+    num_lock_on = on;
+}
+
+void bagua_set_profile_state(bool connected, bool bonded) {
+    profile_connected = connected;
+    profile_bonded = bonded;
+    half_trigram = bonded && !connected;
+    bool was_active = blink_active;
+    blink_active = !connected && !bonded;
+    if (blink_active && !was_active) {
+        blink_visible = true;
+        k_work_schedule(&bagua_blink_work, K_MSEC(500));
+    } else if (!blink_active && was_active) {
+        blink_visible = true;
+        k_work_cancel_delayable(&bagua_blink_work);
+    }
+}
+
+// Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
+static const uint16_t profile_colors[8] = {
+    0xF800, // red      - 离 (top)
+    0xFFE0, // yellow   - 坤 (upper-right)
+    0xFFFF, // white    - 兑 (right)
+    0xFEC0, // gold     - 乾 (lower-right)
+    0x001F, // blue     - 坎 (bottom)
+    0xA140, // brown    - 艮 (lower-left)
+    0xF81F, // purple   - 震 (left)
+    0x07FF  // cyan     - 巽 (upper-left)
+};
+static const uint16_t gray_color = 0x8410; // inactive trigram color
 static bool usb_connected = false;
 static bool num_lock_on = false;
 static bool profile_connected = false;
@@ -291,24 +332,6 @@ static void bagua_blink_handler(struct k_work *work) {
         k_work_schedule(&bagua_blink_work, K_MSEC(500));
     }
 }
-
-void bagua_set_active_profile(uint8_t profile) {
-    if (profile > 7) return;
-    active_profile = profile;
-}
-
-// Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
-static const uint16_t profile_colors[8] = {
-    0xF800, // red      - 离 (top)
-    0xFFE0, // yellow   - 坤 (upper-right)
-    0xFFFF, // white    - 兑 (right)
-    0xFEC0, // gold     - 乾 (lower-right)
-    0x001F, // blue     - 坎 (bottom)
-    0xA140, // brown    - 艮 (lower-left)
-    0xF81F, // purple   - 震 (left)
-    0x07FF  // cyan     - 巽 (upper-left)
-};
-static const uint16_t gray_color = 0x8410; // inactive trigram color
 
 // ============== Main drawing function ==============
 
@@ -332,7 +355,16 @@ void draw_bagua(void) {
     // Draw 8 trigrams: horizontal buffer -> rotate -> render
     // Active profile highlights the corresponding trigram; others in gray
     for (int i = 0; i < 8; i++) {
-        uint16_t tri_fg_color = (i == active_profile) ? profile_colors[i] : gray_color;
+        uint16_t tri_fg_color;
+        if (i == active_profile) {
+            if (blink_active && !blink_visible) {
+                tri_fg_color = gray_color;
+            } else {
+                tri_fg_color = profile_colors[i];
+            }
+        } else {
+            tri_fg_color = gray_color;
+        }
         draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern, half_trigram && i == active_profile);
         rotate_trigram(trigram_horiz, trigram_rot,
                        trigram_cos[i], trigram_sin[i]);
@@ -353,7 +385,6 @@ void zmk_widget_bagua_init(void) {
     scaled_bitmap_taichi = k_malloc(row_buf * sizeof(uint16_t));
     trigram_horiz = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
     trigram_rot = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
-    k_work_init_delayable(&bagua_blink_work, bagua_blink_handler);
     k_work_init_delayable(&bagua_blink_work, bagua_blink_handler);
     bagua_initialized = true;
 }
