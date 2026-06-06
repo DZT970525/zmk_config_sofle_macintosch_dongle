@@ -14,9 +14,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zephyr/device.h>
 #include <zephyr/drivers/display.h>
 #include <zmk/display.h>
-#include <zmk/event_manager.h>
-#include <zmk/hid_indicators.h>
-#include <zmk/events/hid_indicators_changed.h>
 
 #include "bagua.h"
 #include "helpers/display.h"

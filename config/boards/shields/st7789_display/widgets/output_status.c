@@ -20,6 +20,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/usb.h>
 #include <zmk/ble.h>
 #include <zmk/endpoints.h>
+#include <zmk/hid_indicators.h>
 
 #include "output_status.h"
 #include "helpers/display.h"
@@ -283,7 +284,6 @@ void set_status_symbol() {
 void output_status_update_cb(struct output_status_state state) {
     status_state = state;
     bagua_set_active_profile(state.active_profile_index);
-    bagua_set_usb_connected(zmk_hid_get_transport() == ZMK_TRANSPORT_USB);
     if (status_widget_initialized) {
         set_status_symbol();
     }
