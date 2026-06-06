@@ -172,7 +172,7 @@ void zmk_widget_layer_init() {
     uint16_t layer_font_size =
         (layer_font_width * layer_font_scale) * (layer_font_height * layer_font_scale);
     scaled_bitmap_layer_font = k_malloc(layer_font_size * 2 * sizeof(uint16_t));
-    last_printed_layer = (struct layer_status_state){.index = 0, .label = '\0'};
+    last_printed_layer = (struct layer_status_state){.index = 0, .label = NULL};
 
     widget_layer_status_init();
 }
