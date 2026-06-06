@@ -28,7 +28,7 @@ static bool layer_widget_running = false;
 static struct layer_status_state current_layer;
 static struct layer_status_state last_printed_layer;
 
-static uint16_t layer_font_scale = 8;
+static uint16_t layer_font_scale = 4;
 static uint16_t layer_font_width = 3;
 static uint16_t layer_font_height = 5;
 static uint16_t *scaled_bitmap_layer_font;
@@ -91,7 +91,7 @@ uint16_t get_y(size_t label_len) {
 uint16_t get_scale(size_t label_len) {
     switch (get_font(label_len)) {
     case FONT_5:
-        return 8;
+        return 4;
     case FONT_4:
         return 4;
     case FONT_3:
@@ -137,7 +137,7 @@ void clear_last_printed_label() {
     uint16_t gap = get_gap(len);
     uint16_t scale = get_scale(len);
     print_repeat_char(scaled_bitmap_layer_font, CHAR_NONE, x, y, scale, get_layer_font_color(),
-                      get_layer_font_bg_color(), FONT_SIZE_3x5, gap, len, label_limit);
+                      get_layer_font_bg_color(), FONT_SIZE_3x6, gap, len, label_limit);
 }
 
 void print_layer() {
@@ -150,7 +150,7 @@ void print_layer() {
     ;
     uint16_t scale = get_scale(len);
     print_char_array(scaled_bitmap_layer_font, current_layer.label, x, y, scale,
-                     get_layer_font_color(), get_layer_font_bg_color(), FONT_SIZE_3x5, gap, len,
+                     get_layer_font_color(), get_layer_font_bg_color(), FONT_SIZE_3x6, gap, len,
                      label_limit);
 
     last_printed_layer = current_layer;
