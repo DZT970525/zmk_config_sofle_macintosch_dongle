@@ -191,13 +191,13 @@ static const int16_t trigram_sin[8] = {
     0, 724, 1024, 724, 0, -724, -1024, -724
 };
 
-#define TMP_BUF_W 38
+#define TMP_BUF_W 40
 
 
-#define TMP_BUF_H 38
+#define TMP_BUF_H 40
 
 
-#define TMP_RC 19
+#define TMP_RC 20
 
 
 
