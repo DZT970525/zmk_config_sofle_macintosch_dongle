@@ -134,14 +134,22 @@ typedef struct {
 } TriPos;
 
 static const TriPos trigrams[8] = {
-    {  0, -63, 0b000 }, // S  - 乾 QIAN - Heaven (≡≡≡)
-    {  45, -45, 0b100 }, // SE - 兑 DUI  - Lake   (::≡)
-    {  63,   0, 0b101 }, // E  - 离 LI   - Fire   (:::)
-    {  45,  45, 0b001 }, // NE - 震 ZHEN - Thunder (≡≡:)
-    {  0,   63, 0b111 }, // N  - 坤 KUN  - Earth  (:::)
-    { -45,  45, 0b011 }, // NW - 艮 GEN  - Mountain (≡::)
-    { -63,   0, 0b110 }, // W  - 坎 KAN  - Water  (::≡)
-    { -45, -45, 0b010 }, // SW - 巽 XUN  - Wind   (:≡:)
+    {  0, -68, 0b000 }, // S  - 乾 QIAN - Heaven (≡≡≡)
+
+    {  48, -48, 0b100 }, // SE - 兑 DUI  - Lake   (::≡)
+
+    {  68,   0, 0b101 }, // E  - 离 LI   - Fire   (:::)
+
+    {  48,  48, 0b001 }, // NE - 震 ZHEN - Thunder (≡≡:)
+
+    {  0,   68, 0b111 }, // N  - 坤 KUN  - Earth  (:::)
+
+    { -48,  48, 0b011 }, // NW - 艮 GEN  - Mountain (≡::)
+
+    { -68,   0, 0b110 }, // W  - 坎 KAN  - Water  (::≡)
+
+    { -48, -48, 0b010 }, // SW - 巽 XUN  - Wind   (:≡:)
+
 };
 
 // ============== Static state ==============
