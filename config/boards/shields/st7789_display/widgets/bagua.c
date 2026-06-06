@@ -287,7 +287,7 @@ static const uint16_t profile_colors[8] = {
     0xFFFF, // white    - 兑 (right)
     0xFEC0, // gold     - 乾 (lower-right)
     0x001F, // blue     - 坎 (bottom)
-    0xFD20, // orange   - 艮 (lower-left)
+    0xA140  // brown    - 艮 (lower-left)
     0xF81F, // purple   - 震 (left)
     0x07FF  // cyan     - 巽 (upper-left)
 };
