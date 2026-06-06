@@ -82,7 +82,7 @@ void print_frames() {
 void print_menu() {
     clear_screen();
     start_bagua();
-    print_frames();
+    // print_frames();
     start_battery_status();
     start_output_status();
     start_layer_status();
