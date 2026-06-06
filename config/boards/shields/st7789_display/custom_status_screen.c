@@ -14,7 +14,7 @@
 #include "widgets/logo.h"
 #include "widgets/configuration.h"
 // #include "widgets/wpm.h"
-#include "widgets/modifier.h"
+// #include "widgets/modifier.h"
 #include <zmk/activity.h>
 #include <zmk/events/activity_state_changed.h>
 #include <zephyr/logging/log.h>
@@ -80,7 +80,7 @@ lv_obj_t *zmk_display_status_screen() {
     start_layer_status();
     zmk_widget_action_button_init();
         // zmk_widget_wpm_init();
-    zmk_widget_modifier_init();
+        // zmk_widget_modifier_init();
 
     // 启动开机 splash 动画
     lv_timer_create(timer_splash, SPLASH_DURATION_MS, NULL);
