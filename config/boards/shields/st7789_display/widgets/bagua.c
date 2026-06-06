@@ -276,6 +276,23 @@ static void rotate_trigram(const uint16_t *src, uint16_t *dst,
 // ============== BT Profile color control ==============
 static uint8_t active_profile = 0;
 
+static bool usb_connected = false;
+static bool num_lock_on = false;
+static bool profile_connected = false;
+static bool profile_bonded = false;
+static bool blink_visible = true;
+static bool blink_active = false;
+static bool half_trigram = false;
+static struct k_work_delayable bagua_blink_work;
+
+static void bagua_blink_handler(struct k_work *work) {
+    blink_visible = !blink_visible;
+    draw_bagua();
+    if (blink_active) {
+        k_work_schedule(&bagua_blink_work, K_MSEC(500));
+    }
+}
+
 void bagua_set_active_profile(uint8_t profile) {
     if (profile > 7) return;
     active_profile = profile;
