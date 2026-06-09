@@ -275,10 +275,8 @@ void print_symbols(uint16_t usb_x, uint16_t ble_x, uint16_t y, struct output_sta
 }
 
 void set_status_symbol() {
-    // Profile number display removed - color indicates active profile via bagua
-
-    print_bluetooth_status(bluetooth_status_x, bluetooth_status_y, status_state);
-    print_symbols(symbol_usb_x, symbol_ble_x, symbols_y, status_state);
+    // Hidden: status icons (BT status + USB/BLE symbols) removed from display
+    // Event handling for bagua profile updates still runs via output_status_update_cb
 }
 
 void output_status_update_cb(struct output_status_state state) {
