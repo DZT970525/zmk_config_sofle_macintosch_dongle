@@ -1,3 +1,31 @@
+// === Numpad variant (left PCB as numpad) ===
+#if defined(CONFIG_BOARD_SOFLE_DONGLE_NUMPAD)
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        numpad_layer {
+            display-name = "NUMPAD";
+            bindings = <
+&kp NUM_LOCK  &kp KP_DIVIDE &kp KP_MULTIPLY &kp KP_MINUS   &none &none
+&kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp KP_PLUS      &none &none
+&kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp KP_PLUS      &none &none
+&kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp KP_ENTER     &none &none
+&kp KP_NUMBER_0  &kp KP_NUMBER_0  &kp KP_DOT       &kp KP_ENTER     &none &none
+&kp KP_NUMBER_0  &none            &kp KP_DOT       &none            &none &none
+&none            &none            &none            &none            &none &none
+            >;
+        };
+    };
+};
+
+#else
+
 /*
  * Copyright (c) 2025 ZitaoTech
  *
@@ -159,3 +187,5 @@
         };
     };
 };
+
+#endif
