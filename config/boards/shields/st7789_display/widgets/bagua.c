@@ -17,6 +17,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/event_manager.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
+#include <lvgl.h>
 
 #include "bagua.h"
 #include "helpers/display.h"
@@ -308,7 +309,13 @@ static bool blink_visible = true;
 static bool blink_active = false;
 static bool half_trigram = false;
 static struct k_work_delayable bagua_blink_work;
+static lv_timer_t *bagua_redraw_timer;
 static uint8_t active_layer = 0;
+
+static void bagua_redraw_cb(lv_timer_t *timer) {
+    draw_bagua();
+    lv_timer_pause(timer);
+}
 
 static void bagua_blink_handler(struct k_work *work) {
     blink_visible = !blink_visible;
@@ -321,14 +328,17 @@ static void bagua_blink_handler(struct k_work *work) {
 void bagua_set_active_profile(uint8_t profile) {
     if (profile > 7) return;
     active_profile = profile;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
 }
 
 void bagua_set_usb_connected(bool connected) {
     usb_connected = connected;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
 }
 
 void bagua_set_num_lock(bool on) {
     num_lock_on = on;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
 }
 
 void bagua_set_profile_state(bool connected, bool bonded) {
@@ -348,10 +358,12 @@ void bagua_set_profile_state(bool connected, bool bonded) {
 
 void bagua_set_layer(uint8_t layer) {
     active_layer = layer;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
 }
 
 static int bagua_layer_listener_cb(const zmk_event_t *eh) {
     active_layer = zmk_keymap_highest_layer_active();
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
     return 0;
 }
 
@@ -434,6 +446,8 @@ void zmk_widget_bagua_init(void) {
     trigram_rot = k_malloc(TMP_BUF_W * TMP_BUF_H * sizeof(uint16_t));
     taichi_rotated = k_malloc(TAICHI_W * TAICHI_H * sizeof(uint16_t));
     k_work_init_delayable(&bagua_blink_work, bagua_blink_handler);
+    bagua_redraw_timer = lv_timer_create(bagua_redraw_cb, 1, NULL);
+    if (bagua_redraw_timer) lv_timer_pause(bagua_redraw_timer);
     bagua_initialized = true;
 }
 
