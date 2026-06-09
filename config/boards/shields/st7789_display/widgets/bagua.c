@@ -16,6 +16,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/layer_state_changed.h>
+#include <zmk/events/hid_indicators_changed.h>
 #include <zmk/keymap.h>
 #include <lvgl.h>
 
@@ -303,6 +304,7 @@ static uint8_t active_profile = 0;
 
 static bool usb_connected = false;
 static bool num_lock_on = false;
+static bool caps_lock_on = false;
 static bool profile_connected = false;
 static bool profile_bonded = false;
 static bool blink_visible = true;
@@ -356,6 +358,11 @@ void bagua_set_profile_state(bool connected, bool bonded) {
     }
 }
 
+void bagua_set_caps_lock(bool on) {
+    caps_lock_on = on;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
+}
+
 void bagua_set_layer(uint8_t layer) {
     active_layer = layer;
     if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
@@ -369,6 +376,19 @@ static int bagua_layer_listener_cb(const zmk_event_t *eh) {
 
 ZMK_LISTENER(bagua_layer_status, bagua_layer_listener_cb);
 ZMK_SUBSCRIPTION(bagua_layer_status, zmk_layer_state_changed);
+
+// ============== HID indicators (NumLock/CapsLock) ==============
+static int bagua_hid_listener_cb(const zmk_event_t *eh) {
+    const struct zmk_hid_indicators_changed *ev = as_zmk_hid_indicators_changed(eh);
+    if (!ev) return 0;
+    num_lock_on = (ev->indicators & 0x01) != 0;
+    caps_lock_on = (ev->indicators & 0x02) != 0;
+    if (bagua_redraw_timer) lv_timer_resume(bagua_redraw_timer);
+    return 0;
+}
+
+ZMK_LISTENER(bagua_hid_status, bagua_hid_listener_cb);
+ZMK_SUBSCRIPTION(bagua_hid_status, zmk_hid_indicators_changed);
 
 // Profile colors (RGB565): 0=red, 1=yellow, 2=green, 3=cyan, 4=magenta
 static const uint16_t profile_colors[8] = {
@@ -411,28 +431,55 @@ void draw_bagua(void) {
                   TAICHI_W, TAICHI_H, scale,
                   fg, bg);
 
-    // Draw 8 trigrams: horizontal buffer -> rotate -> render
-    // Active profile highlights the corresponding trigram; others in gray
-    for (int i = 0; i < 8; i++) {
-        uint16_t tri_fg_color;
-        if (i == active_profile) {
-            if (blink_active && !blink_visible) {
-                tri_fg_color = gray_color;
-            } else {
-                tri_fg_color = profile_colors[i];
-            }
-        } else {
-            tri_fg_color = gray_color;
-        }
-        draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern, half_trigram && i == active_profile);
-        rotate_trigram(trigram_horiz, trigram_rot,
-                       trigram_cos[i], trigram_sin[i]);
+    // === BT Profile trigrams (0-4) ===
+    for (int i = 0; i < 5; i++) {
+        uint16_t color = (i == active_profile)
+            ? ((blink_active && !blink_visible) ? gray_color : profile_colors[i])
+            : gray_color;
+        bool do_half = (i == active_profile) && half_trigram;
+        draw_one_trigram_horiz(trigram_horiz, trigrams[i].pattern, do_half);
+        rotate_trigram(trigram_horiz, trigram_rot, trigram_cos[i], trigram_sin[i]);
         uint16_t tx = 120 + trigrams[i].dx;
         uint16_t ty = 120 + trigrams[i].dy;
         render_bitmap(trigram_rot, trigram_rot,
-                      tx - TMP_RC, ty - TMP_RC,
-                      TMP_BUF_W, TMP_BUF_H, 1,
-                      tri_fg_color, bg);
+                      tx - TMP_RC, ty - TMP_RC, TMP_BUF_W, TMP_BUF_H, 1,
+                      color, bg);
+    }
+
+    // === 艮 GEN (index 5) - USB indicator ===
+    {
+        uint16_t color = usb_connected ? profile_colors[5] : gray_color;
+        draw_one_trigram_horiz(trigram_horiz, trigrams[5].pattern, false);
+        rotate_trigram(trigram_horiz, trigram_rot, trigram_cos[5], trigram_sin[5]);
+        uint16_t tx = 120 + trigrams[5].dx;
+        uint16_t ty = 120 + trigrams[5].dy;
+        render_bitmap(trigram_rot, trigram_rot,
+                      tx - TMP_RC, ty - TMP_RC, TMP_BUF_W, TMP_BUF_H, 1,
+                      color, bg);
+    }
+
+    // === 震 ZHEN (index 6) - CapsLock indicator ===
+    {
+        uint16_t color = caps_lock_on ? profile_colors[6] : gray_color;
+        draw_one_trigram_horiz(trigram_horiz, trigrams[6].pattern, false);
+        rotate_trigram(trigram_horiz, trigram_rot, trigram_cos[6], trigram_sin[6]);
+        uint16_t tx = 120 + trigrams[6].dx;
+        uint16_t ty = 120 + trigrams[6].dy;
+        render_bitmap(trigram_rot, trigram_rot,
+                      tx - TMP_RC, ty - TMP_RC, TMP_BUF_W, TMP_BUF_H, 1,
+                      color, bg);
+    }
+
+    // === 巽 XUN (index 7) - NumLock indicator ===
+    {
+        uint16_t color = num_lock_on ? profile_colors[7] : gray_color;
+        draw_one_trigram_horiz(trigram_horiz, trigrams[7].pattern, false);
+        rotate_trigram(trigram_horiz, trigram_rot, trigram_cos[7], trigram_sin[7]);
+        uint16_t tx = 120 + trigrams[7].dx;
+        uint16_t ty = 120 + trigrams[7].dy;
+        render_bitmap(trigram_rot, trigram_rot,
+                      tx - TMP_RC, ty - TMP_RC, TMP_BUF_W, TMP_BUF_H, 1,
+                      color, bg);
     }
 
 }
