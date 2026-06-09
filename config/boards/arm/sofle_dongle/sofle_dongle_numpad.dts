@@ -221,4 +221,3 @@ lpm_view_spi: &spi2 {
         };
     };
 };
-
