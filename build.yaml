@@ -7,7 +7,7 @@ include:
   - board: sofle_dongle_right
     shield: lpm_view;right_trackpoint_dongle
 
-
+# reset firmware
   - board: sofle_dongle
     shield: st7789_display;settings_reset
   - board: sofle_dongle_left
