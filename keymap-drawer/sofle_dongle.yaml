@@ -1,6 +1,145 @@
 layout: {zmk_keyboard: sofle_dongle}
 layers:
-  QWERTY:
+  QWERTY: ['&bootloader', ESC, '1', '2', '3', '4', '5', MUTE, MUTE, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp
+      LCLK', '&mkp LCLK', H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PG DN, PG UP, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT,
+    SPACE, LOWER, LOWER, SPACE, '-', '=', '`']
+  LOWER:
+  - '&bootloader'
+  - ESC
+  - F1
+  - F2
+  - F3
+  - F4
+  - F5
+  - BT CLR
+  - MUTE
+  - F6
+  - F7
+  - F8
+  - F9
+  - F10
+  - DEL
+  - TAB
+  - {t: ▽, type: trans}
+  - UP
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - OUT TOG
+  - F11
+  - F12
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - HOME
+  - \
+  - CAPS
+  - LEFT
+  - DOWN
+  - RIGHT
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&mkp RCLK'
+  - '&mkp RCLK'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - ''''
+  - ENTER
+  - LSHFT
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - RGB TOG
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&bl BL_DEC'
+  - '&bl BL_INC'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '['
+  - ']'
+  - _
+  - +
+  - '&bootloader'
+  - LGUI
+  - LALT
+  - SPACE
+  - {t: LOWER, type: held}
+  - LOWER
+  - SPACE
+  - {t: ▽, type: trans}
+  - .
+  - '&bootloader'
+  RAISE:
+  - '&bootloader'
+  - ESC
+  - F1
+  - F2
+  - F3
+  - F4
+  - F5
+  - BT CLR
+  - MUTE
+  - F6
+  - F7
+  - F8
+  - F9
+  - F10
+  - BSPC
+  - TAB
+  - {t: ▽, type: trans}
+  - UP
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - OUT TOG
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - CAPS
+  - LEFT
+  - DOWN
+  - RIGHT
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - '&mkp RCLK'
+  - ''
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - LSHFT
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - RGB TOG
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - ''
+  - ''
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - ''
+  - LGUI
+  - LALT
+  - SPACE
+  - LOWER
+  - LOWER
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  MOUSE:
   - '&bootloader'
   - ESC
   - '1'
@@ -8,7 +147,7 @@ layers:
   - '3'
   - '4'
   - '5'
-  - MUTE
+  - BT CLR
   - MUTE
   - '6'
   - '7'
@@ -23,11 +162,11 @@ layers:
   - R
   - T
   - Y
-  - U
+  - {t: U, h: '&mkp MB3'}
   - I
   - O
   - P
-  - ENTER
+  - \
   - CAPS
   - A
   - S
@@ -37,240 +176,36 @@ layers:
   - '&mkp LCLK'
   - '&mkp LCLK'
   - H
-  - J
+  - {t: J, h: '&mkp MB1'}
   - K
   - L
   - ;
-  - \
+  - ENTER
   - LSHFT
   - Z
   - X
   - C
   - V
   - B
-  - PG DN
-  - PG UP
-  - {t: '[', h: '{'}
-  - {t: ']', h: '}'}
+  - '&msc SCRL_DOWN'
+  - '&msc SCRL_UP'
+  - ''
+  - ''
   - N
-  - M
+  - {t: M, h: '&mkp MB2'}
   - ','
   - .
   - /
+  - RSHIFT
+  - LCTRL
+  - LGUI
+  - LALT
+  - SPACE
+  - '&mkp MB1'
+  - '&mkp MB1'
+  - '&tdRMCLK'
+  - '-'
   - '='
-  - LCTRL
-  - LGUI
-  - LALT
-  - SPACE
-  - LOWER
-  - LOWER
-  - SPACE
-  - RAISE
   - '`'
-  - '-'
-  LOWER:
-  - '&bootloader'
-  - '`'
-  - F1
-  - F2
-  - F3
-  - F4
-  - F5
-  - BT CLR
-  - MUTE
-  - F6
-  - F7
-  - /
-  - '*'
-  - '-'
-  - DEL
-  - TAB
-  - {t: ▽, type: trans}
-  - UP
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - OUT TOG
-  - F8
-  - '7'
-  - '8'
-  - '9'
-  - HOME
-  - ENTER
-  - CAPS
-  - LEFT
-  - DOWN
-  - RIGHT
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - '&mkp RCLK'
-  - '&mkp RCLK'
-  - F10
-  - '4'
-  - '5'
-  - '6'
-  - '?'
-  - '|'
-  - LSHFT
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - RGB TOG
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - '&bl BL_DEC'
-  - '&bl BL_INC'
-  - F12
-  - '1'
-  - '2'
-  - '3'
-  - _
-  - +
-  - '&bootloader'
-  - LGUI
-  - LALT
-  - SPACE
-  - {t: LOWER, type: held}
-  - LOWER
-  - '0'
-  - {t: MOUSE, h: toggle}
-  - .
-  - '&bootloader'
-  RAISE:
-  - '&bootloader'
-  - '`'
-  - F1
-  - F2
-  - F3
-  - F4
-  - F5
-  - BT CLR
-  - MUTE
-  - ''
-  - ''
-  - ''
-  - UP
-  - ''
-  - BSPC
-  - TAB
-  - {t: ▽, type: trans}
-  - UP
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - OUT TOG
-  - ''
-  - ''
-  - LEFT
-  - DOWN
-  - RIGHT
-  - ''
-  - CAPS
-  - LEFT
-  - DOWN
-  - RIGHT
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - '&mkp RCLK'
-  - ''
-  - '&mkp LCLK'
-  - '&mkp RCLK'
-  - ''
-  - ''
-  - ''
-  - ''
-  - LSHFT
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - RGB TOG
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - LGUI
-  - LALT
-  - SPACE
-  - LOWER
-  - LOWER
-  - '&mkp MB2'
-  - {type: held}
-  - ''
-  - ''
-  MOUSE:
-  - '&bootloader'
-  - ESC
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - BT CLR
-  - MUTE
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - BSPC
-  - TAB
-  - Q
-  - W
-  - E
-  - R
-  - T
-  - ''
-  - '&mkp MB3'
-  - ''
-  - ''
-  - ''
-  - ''
-  - CAPS
-  - A
-  - S
-  - D
-  - F
-  - ''
-  - '&mkp LCLK'
-  - '&mkp LCLK'
-  - ''
-  - '&mkp LCLK'
-  - ''
-  - ''
-  - ''
-  - ''
-  - LSHFT
-  - Z
-  - X
-  - C
-  - V
-  - B
-  - '&msc SCRL_DOWN'
-  - '&msc SCRL_UP'
-  - ''
-  - ''
-  - ''
-  - '&mkp RCLK'
-  - ''
-  - '&msc SCRL_UP'
-  - ''
-  - ''
-  - LCTRL
-  - LGUI
-  - LALT
-  - SPACE
-  - {t: QWERTY, h: toggle}
-  - {t: QWERTY, h: toggle}
-  - SPACE
-  - {t: QWERTY, h: toggle}
-  - ''
-  - '&msc SCRL_DOWN'
   RESERVE: ['&bootloader', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
     '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
