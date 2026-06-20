@@ -32,6 +32,19 @@ static uint16_t *scaled_bitmap_1;
 static uint8_t previous_battery_level_0 = 0;
 static uint8_t previous_battery_level_1 = 0;
 
+// Disconnect detection is event-driven, not time-based. A peripheral only emits
+// a battery report when its state-of-charge actually CHANGES (see ZMK
+// app/src/battery.c), so a connected half with a stable level can stay silent
+// for many minutes or hours - it also stops sampling entirely while idle.
+// Therefore report timing must NOT be used to infer staleness.
+//
+// Instead, the central itself tells us about a disconnect: when a half drops,
+// split_central_disconnected() relays a battery event with level 0 for that
+// source (see app/src/split/bluetooth/central.c, requires
+// CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING). We treat level 0 as the
+// "disconnected" signal and render it as the "--%" placeholder, while any
+// level > 0 is a genuine reading we keep showing until it changes.
+
 #ifdef CONFIG_SHOW_SINGLE_BATTERY
 static const uint16_t font_offset = 6;
 static const uint16_t single_battery_offset = 60;
@@ -136,14 +149,25 @@ void set_battery_symbol() {
 }
 
 void battery_status_update_cb(struct peripheral_battery_state state) {
+    // A level of 0 means the half disconnected (relayed by the central); it is
+    // rendered as the "--%" placeholder by print_percentage(). Any level > 0 is
+    // a real reading. We dedup against the last value so an unchanged report
+    // (or a repeated disconnect) does not trigger a redundant redraw.
     if (state.source == 0) {
+        if (state.level == previous_battery_level_0) {
+            return;
+        }
+        previous_battery_level_0 = state.level;
         battery_state_0 = state;
     } else {
+        if (state.level == previous_battery_level_1) {
+            return;
+        }
+        previous_battery_level_1 = state.level;
         battery_state_1 = state;
     }
-    if (battery_widget_initialized) {
-    }
-    if (battery_widget_running) {
+
+    if (battery_widget_initialized && battery_widget_running) {
         set_battery_symbol();
     }
 }
