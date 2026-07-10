@@ -6,8 +6,8 @@
 **3. After editing the keymap, choose commit changes.**  
 **and then check the Github Actions section.**  
 **Your new firmware file should be available for download.**  
-**5. Unzip the firmware.zip file. You should see one files: `st7789_display-sofle_dongle-zmk.uf2`.**  
-**6. Flash the dongle with your new firmware if you just need to change the keymap.**  
+**5. Unzip the firmware.zip file. You should see one files: `lpm_view;left_bbtrackpad_keypoint-zitaotech_keypoint_left-zmk.uf2`.**  
+**6. Flash the left keyboard with your new firmware if you just need to change the keymap.**  
 
 ```Option2```  
 **0. Register a github account if you don't have one.**  
