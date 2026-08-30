@@ -1,0 +1,8 @@
+file_format: "1"
+id: left_bbtrackpad_dongle
+name: left_bbtrackpad_dongle
+type: shield
+url:
+requires:
+features:
+  - mouse

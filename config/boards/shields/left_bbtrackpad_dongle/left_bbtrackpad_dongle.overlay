@@ -1,0 +1,130 @@
+/*
+*
+* Copyright (c) 2025 ZitaoTech
+* SPDX-License-Identifier: MIT
+*
+*/
+
+/ {
+    chosen {
+        zmk,trackpad_led = &trackpad_led;
+        zmk,custom_led=&custom_led;
+    };
+    trackpad_led: pwmledo{
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm1 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+    
+    custom_led: pwmledto{
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm2 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pwm1_default>;
+    pinctrl-1 = <&pwm1_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+&pwm2 {
+    status = "okay";
+    pinctrl-0 = <&pwm2_default>;
+    pinctrl-1 = <&pwm2_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+
+&i2c0 {
+    status = "okay";
+    compatible = "nordic,nrf-twim";
+    clock-frequency = <I2C_BITRATE_FAST>; 
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    bbtrackpad:a320@3B {
+        compatible = "avago,a320";
+        reg = <0x3B>;
+        status = "okay";
+    };
+    
+};
+
+/ {
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        bbtrackpad_split: bbtrackpad_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+
+    };
+
+    /* Listeners */
+    bbtrackpad_listener: bbtrackpad_listener {
+        compatible = "zmk,input-listener";
+        status = "disabled";
+        device = <&bbtrackpad_split>;
+    };
+
+};
+
+
+&bbtrackpad_split {
+    device = <&bbtrackpad>;
+};
+
+
+
+&pinctrl {
+    pwm1_default:pwm1_default{
+        group1{
+            psels = <NRF_PSEL(PWM_OUT0, 0, 7)>; // Backlight for Trackball
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 7)>;
+            bias-pull-down;
+        };
+    };
+
+    pwm2_default:pwm2_default{
+        group1{
+            psels = <NRF_PSEL(PWM_OUT0, 0, 16)>; // GPIO for custom led
+        };
+    };
+
+    pwm2_sleep: pwm2_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 16)>;
+            bias-pull-down;
+        };
+    };
+
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 9)>,
+                <NRF_PSEL(TWIM_SCL, 0, 12)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 9)>,
+                <NRF_PSEL(TWIM_SCL, 0, 12)>;
+            low-power-enable;
+        };
+    };
+};
+
+
