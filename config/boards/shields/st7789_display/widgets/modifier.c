@@ -23,14 +23,16 @@ LOG_MODULE_REGISTER(modifier, LOG_LEVEL_INF);
 static bool modifier_widget_running = false;
 static bool modifier_widget_initialized = false;
 
-static uint16_t modifier_font_scale = 2;
+static const uint16_t modifier_font_scale = 1;
 static uint16_t modifier_font_width = 11;
 static uint16_t modifier_font_height = 11;
 static uint16_t *scaled_bitmap_modifier_font;
+static uint8_t *modifier_box_buf;
 
-SlotSide modifier_slot_side = SLOT_SIDE_NONE;
-static uint16_t modifier_x = 7;
-static uint16_t modifier_y = 120;
+static const uint16_t modifier_y = 204;
+static const uint16_t modifier_box_width = 48;
+static const uint16_t modifier_box_height = 18;
+static const uint16_t modifier_x[] = {14, 66, 122, 174};
 
 struct modifiers_state {
     uint8_t modifiers;
@@ -66,49 +68,53 @@ static const uint16_t shitf_bitmap[] = {
     0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0,
 };
 
+static void print_modifier_key(const uint16_t bitmap[], uint16_t x, bool pressed) {
+    uint16_t foreground = pressed ? get_menu_bg_color() : get_frame_color();
+    uint16_t background = pressed ? get_frame_color() : get_menu_bg_color();
+    uint16_t border = foreground;
+
+    print_filled_screen_area(x, modifier_y, modifier_box_width, modifier_box_height, background);
+    print_rectangle(modifier_box_buf, x, x + modifier_box_width - 2, modifier_y,
+                    modifier_y + modifier_box_height - 2, border, 1);
+    render_bitmap(scaled_bitmap_modifier_font, (uint16_t *)bitmap, x + 18, modifier_y + 4,
+                  modifier_font_width, modifier_font_height, modifier_font_scale, foreground,
+                  background);
+}
+
 void print_modifiers() {
-    if (modifier_slot_side == SLOT_SIDE_NONE) {
-        return;
+    print_modifier_key(shitf_bitmap, modifier_x[0],
+                       (modifier_state.modifiers & (MOD_LSFT | MOD_RSFT)) != 0);
+    print_modifier_key(ctrl_bitmap, modifier_x[1],
+                       (modifier_state.modifiers & (MOD_LCTL | MOD_RCTL)) != 0);
+    print_modifier_key(cmd_bitmap, modifier_x[2],
+                       (modifier_state.modifiers & (MOD_LGUI | MOD_RGUI)) != 0);
+    print_modifier_key(option_bitmap, modifier_x[3],
+                       (modifier_state.modifiers & (MOD_LALT | MOD_RALT)) != 0);
+}
+
+static void print_changed_modifiers(uint8_t previous, uint8_t current) {
+    bool was_pressed = (previous & (MOD_LSFT | MOD_RSFT)) != 0;
+    bool is_pressed = (current & (MOD_LSFT | MOD_RSFT)) != 0;
+    if (was_pressed != is_pressed) {
+        print_modifier_key(shitf_bitmap, modifier_x[0], is_pressed);
     }
 
-    if ((modifier_state.modifiers & (MOD_LGUI | MOD_RGUI)) > 0) {
-        render_bitmap(scaled_bitmap_modifier_font, cmd_bitmap, modifier_x, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_selected_color(), get_modifier_bg_color());
-    } else {
-        render_bitmap(scaled_bitmap_modifier_font, cmd_bitmap, modifier_x, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_unselected_color(), get_modifier_bg_color());
+    was_pressed = (previous & (MOD_LCTL | MOD_RCTL)) != 0;
+    is_pressed = (current & (MOD_LCTL | MOD_RCTL)) != 0;
+    if (was_pressed != is_pressed) {
+        print_modifier_key(ctrl_bitmap, modifier_x[1], is_pressed);
     }
 
-    if ((modifier_state.modifiers & (MOD_LALT | MOD_RALT)) > 0) {
-        render_bitmap(scaled_bitmap_modifier_font, option_bitmap, modifier_x + 28, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_selected_color(), get_modifier_bg_color());
-    } else {
-        render_bitmap(scaled_bitmap_modifier_font, option_bitmap, modifier_x + 28, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_unselected_color(), get_modifier_bg_color());
+    was_pressed = (previous & (MOD_LGUI | MOD_RGUI)) != 0;
+    is_pressed = (current & (MOD_LGUI | MOD_RGUI)) != 0;
+    if (was_pressed != is_pressed) {
+        print_modifier_key(cmd_bitmap, modifier_x[2], is_pressed);
     }
 
-    if ((modifier_state.modifiers & (MOD_LCTL | MOD_RCTL)) > 0) {
-        render_bitmap(scaled_bitmap_modifier_font, ctrl_bitmap, modifier_x + 56, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_selected_color(), get_modifier_bg_color());
-    } else {
-        render_bitmap(scaled_bitmap_modifier_font, ctrl_bitmap, modifier_x + 56, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_unselected_color(), get_modifier_bg_color());
-    }
-
-    if ((modifier_state.modifiers & (MOD_LSFT | MOD_RSFT)) > 0) {
-        render_bitmap(scaled_bitmap_modifier_font, shitf_bitmap, modifier_x + 84, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_selected_color(), get_modifier_bg_color());
-    } else {
-        render_bitmap(scaled_bitmap_modifier_font, shitf_bitmap, modifier_x + 84, modifier_y,
-                      modifier_font_width, modifier_font_height, modifier_font_scale,
-                      get_modifier_unselected_color(), get_modifier_bg_color());
+    was_pressed = (previous & (MOD_LALT | MOD_RALT)) != 0;
+    is_pressed = (current & (MOD_LALT | MOD_RALT)) != 0;
+    if (was_pressed != is_pressed) {
+        print_modifier_key(option_bitmap, modifier_x[3], is_pressed);
     }
 }
 
@@ -117,9 +123,10 @@ static struct modifiers_state modifiers_get_state(const zmk_event_t *eh) {
 }
 
 void modifiers_update_cb(struct modifiers_state state) {
+    uint8_t previous = modifier_state.modifiers;
     modifier_state = state;
     if (modifier_widget_initialized && modifier_widget_running) {
-        print_modifiers();
+        print_changed_modifiers(previous, state.modifiers);
     }
 }
 
@@ -132,11 +139,7 @@ void zmk_widget_modifier_init() {
     uint16_t modifier_font_size =
         (modifier_font_width * modifier_font_scale) * (modifier_font_height * modifier_font_scale);
     scaled_bitmap_modifier_font = k_malloc(modifier_font_size * 2 * sizeof(uint16_t));
-
-    modifier_slot_side = get_slot_to_print(INFO_SLOT_MODIFIERS);
-    if (modifier_slot_side == SLOT_SIDE_RIGHT) {
-        modifier_x += 120;
-    }
+    modifier_box_buf = k_malloc(modifier_box_width * 2);
 
     widget_modifiers_init();
     modifier_widget_initialized = true;
