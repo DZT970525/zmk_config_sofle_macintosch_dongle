@@ -1,6 +1,11 @@
+#pragma once
+
 #include <zephyr/kernel.h>
+#include <zephyr/drivers/display.h>
 
 #define HEX_PARSE_ERROR ((uint32_t)-1)
+
+uint16_t rgb888_to_rgb565(uint32_t color);
 
 typedef enum {
     SLOT_SIDE_LEFT,
@@ -94,6 +99,9 @@ void print_rectangle(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint1
                      uint16_t end_y, uint16_t color, uint16_t scale);
 void render_filled_rectangle(uint8_t *buf_area, uint8_t x, uint8_t y, uint8_t width,
                              uint8_t height);
+void print_filled_screen_area(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+                              uint16_t color);
+void print_checkerboard_screen(uint16_t light_color, uint16_t dark_color);
 
 void set_default_screen(DefaultScreen screen);
 void set_splash_logo_color(uint32_t color);

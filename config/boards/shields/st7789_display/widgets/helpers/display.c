@@ -1697,10 +1697,43 @@ void print_rectangle(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint1
 void render_filled_rectangle(uint8_t *buf_area, uint8_t x, uint8_t y, uint8_t width,
                              uint8_t height) {
     struct display_buffer_descriptor buf_desc_area;
+    buf_desc_area.buf_size = width * height;
     buf_desc_area.pitch = width;
     buf_desc_area.width = width;
     buf_desc_area.height = height;
     display_write_wrapper(x, y, &buf_desc_area, buf_area);
+}
+
+void print_filled_screen_area(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+                              uint16_t color) {
+    fill_buffer_color(buf_screen_area, buf_screen_size, color);
+
+    for (uint16_t offset_y = 0; offset_y < height; offset_y += screen_height) {
+        uint16_t tile_height = MIN(screen_height, height - offset_y);
+        for (uint16_t offset_x = 0; offset_x < width; offset_x += screen_width) {
+            uint16_t tile_width = MIN(screen_width, width - offset_x);
+            render_filled_rectangle(buf_screen_area, x + offset_x, y + offset_y, tile_width,
+                                    tile_height);
+        }
+    }
+}
+
+void print_checkerboard_screen(uint16_t light_color, uint16_t dark_color) {
+    uint16_t *pixels = (uint16_t *)buf_screen_area;
+
+    /* One physical pixel per cell reproduces the classic 1-bit Mac desktop dither. */
+    for (uint16_t y = 0; y < screen_height; y++) {
+        for (uint16_t x = 0; x < screen_width; x++) {
+            uint16_t color = ((x + y) & 1u) ? dark_color : light_color;
+            pixels[(y * screen_width) + x] = swap_16_bit_color(color);
+        }
+    }
+
+    for (uint16_t y = 0; y < 240; y += screen_height) {
+        for (uint16_t x = 0; x < 240; x += screen_width) {
+            render_filled_rectangle(buf_screen_area, x, y, screen_width, screen_height);
+        }
+    }
 }
 
 void clear_screen() {

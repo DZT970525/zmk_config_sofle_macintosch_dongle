@@ -22,15 +22,27 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/endpoints.h>
 
 #include "output_status.h"
+#include "layer_status.h"
 #include "helpers/display.h"
-
-SlotSide connectivity_slot_side = SLOT_SIDE_NONE;
 
 static bool status_widget_initialized = false;
 static struct output_status_state status_state;
 static uint16_t *scaled_bitmap_status;
 static uint16_t *scaled_bitmap_symbol;
 static uint16_t *scaled_bitmap_bt_num;
+static uint16_t logo_bitmap[34 * 42];
+
+static uint16_t to_display_color(uint16_t color) { return (color >> 8) | (color << 8); }
+
+static void write_logo_bitmap(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+    struct display_buffer_descriptor descriptor = {
+        .buf_size = width * height,
+        .pitch = width,
+        .width = width,
+        .height = height,
+    };
+    display_write_wrapper(x, y, &descriptor, (uint8_t *)logo_bitmap);
+}
 
 static const uint16_t status_height = 9;
 static const uint16_t status_width = 9;
@@ -43,14 +55,6 @@ static const uint16_t symbol_height = 15;
 static const uint16_t bt_num_scale = 4;
 static const uint16_t bt_num_width = 5;
 static const uint16_t bt_num_height = 7;
-
-static uint16_t bluetooth_profiles_x = 58;
-static uint16_t bluetooth_profiles_y = 117;
-static uint16_t bluetooth_status_x = 84;
-static uint16_t bluetooth_status_y = 117;
-static uint16_t symbol_usb_x = 12;
-static uint16_t symbol_ble_x = 36;
-static uint16_t symbols_y = 116;
 
 static const uint16_t usb_ready_bitmap[] = {
     0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -190,36 +194,142 @@ void print_bluetooth_profiles(uint16_t x, uint16_t y, struct output_status_state
 }
 
 void print_symbols(uint16_t usb_x, uint16_t ble_x, uint16_t y, struct output_status_state state) {
+    const uint16_t usb_active = rgb888_to_rgb565(0xFFD700);
+    const uint16_t ble_active = rgb888_to_rgb565(0x008FD5);
+    const uint16_t inactive = rgb888_to_rgb565(0x808080);
+
     switch (state.selected_endpoint.transport) {
     case ZMK_TRANSPORT_USB:
         print_bitmap_transport(scaled_bitmap_symbol, TRANSPORT_USB, state.usb_is_hid_ready, usb_x,
-                               y, symbol_scale, get_symbol_selected_color(), get_symbol_bg_color());
+                               y, symbol_scale, usb_active, get_symbol_bg_color());
         print_bitmap_transport(scaled_bitmap_symbol, TRANSPORT_BLUETOOTH, true, ble_x, y,
-                               symbol_scale, get_symbol_unselected_color(), get_symbol_bg_color());
+                               symbol_scale, inactive, get_symbol_bg_color());
         break;
     case ZMK_TRANSPORT_BLE:
         print_bitmap_transport(scaled_bitmap_symbol, TRANSPORT_USB, state.usb_is_hid_ready, usb_x,
-                               y, symbol_scale, get_symbol_unselected_color(),
-                               get_symbol_bg_color());
+                               y, symbol_scale, inactive, get_symbol_bg_color());
         print_bitmap_transport(scaled_bitmap_symbol, TRANSPORT_BLUETOOTH, true, ble_x, y,
-                               symbol_scale, get_symbol_selected_color(), get_symbol_bg_color());
+                               symbol_scale, ble_active, get_symbol_bg_color());
         break;
     }
 }
 
-void set_status_symbol() {
-    if (connectivity_slot_side == SLOT_SIDE_NONE) {
+static void print_output_button(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
+                                const char text[], uint8_t text_len, bool selected,
+                                uint16_t selected_background) {
+    const uint16_t black = get_frame_color();
+    const uint16_t white = get_menu_bg_color();
+    const uint16_t foreground = selected ? white : black;
+    const uint16_t background = selected ? selected_background : white;
+    const uint8_t factor = 2;
+    const uint16_t character_width = (7 * factor) + 1;
+    const uint16_t character_height = (9 * factor) + 1;
+    const uint16_t gap = factor + 1;
+    const uint16_t text_width =
+        (text_len * character_width) + ((text_len > 0 ? text_len - 1 : 0) * gap);
+    const uint16_t text_x = x + (width - text_width) / 2;
+    const uint16_t text_y = y + (height - character_height) / 2;
+
+    print_filled_screen_area(x, y, width, height, black);
+    print_filled_screen_area(x + 1, y + 1, width - 2, height - 2, background);
+    print_layer_font_text(scaled_bitmap_bt_num, text, text_len, text_x, text_y, factor, foreground,
+                          background);
+}
+
+static void print_transport_icons(struct output_status_state state) {
+    /* Original transport glyphs: active USB is yellow, active BLE is sky blue,
+     * and whichever transport is inactive is neutral grey. */
+    print_symbols(14, 36, 117, state);
+}
+
+static void print_profile_button(uint8_t profile, bool selected) {
+    static const uint32_t profile_colors[] = {
+        0x73B55B, /* green  */
+        0xFFD700, /* same yellow as the active USB icon */
+        0xC83B3F, /* red: darker for white-number contrast    */
+        0x773B8F, /* purple: darker for white-number contrast */
+        0x4798C8, /* blue   */
+    };
+
+    if (profile > 4) {
         return;
     }
-    print_bluetooth_profiles(bluetooth_profiles_x, bluetooth_profiles_y, status_state);
-    print_bluetooth_status(bluetooth_status_x, bluetooth_status_y, status_state);
-    print_symbols(symbol_usb_x, symbol_ble_x, symbols_y, status_state);
+    char number[] = {(char)('1' + profile)};
+    /* USB, Bluetooth and all five profile slots share one centered horizontal row. */
+    print_output_button(58 + (profile * 25), 118, 24, 28, number, ARRAY_SIZE(number), selected,
+                        rgb888_to_rgb565(profile_colors[profile]));
+}
+
+static void print_classic_macintosh_icon(void) {
+    const uint16_t black = get_frame_color();
+    static const char *const rows[] = {
+        "..#############################..", ".###############################.",
+        "###...........................###", "##.............................##",
+        "##...#######################...##", "##..#########################..##",
+        "##..##.....................##..##", "##..##.....................##..##",
+        "##..##.....................##..##", "##..##....##....##...##....##..##",
+        "##..##....##....##...##....##..##", "##..##....##....##...##....##..##",
+        "##..##..........##.........##..##", "##..##..........##.........##..##",
+        "##..##........####.........##..##", "##..##........####.........##..##",
+        "##..##.....................##..##", "##..##......##....##.......##..##",
+        "##..##......########.......##..##", "##..##.......######........##..##",
+        "##..##.....................##..##", "##..##.....................##..##",
+        "##..#########################..##", "##...#######################...##",
+        "##.............................##", "##.............................##",
+        "##.............................##", "##.............................##",
+        "##....................####.....##", "##..###............#########...##",
+        "##..###.............########...##", "##.............................##",
+        "##.............................##", "##.............................##",
+        "##.............................##", "#################################",
+        ".###############################.", ".##...........................##.",
+        ".##...........................##.", ".##...........................##.",
+        ".###############################.", ".###############################.",
+    };
+
+    /* Compose the 33 x 42 monochrome sampling in RAM, then send it in one transfer. */
+    uint16_t white = to_display_color(get_menu_bg_color());
+    uint16_t black_pixel = to_display_color(black);
+    for (uint16_t i = 0; i < 33 * 42; i++) {
+        logo_bitmap[i] = white;
+    }
+    for (uint8_t y = 0; y < ARRAY_SIZE(rows); y++) {
+        for (uint8_t x = 0; x < 33; x++) {
+            if (rows[y][x] == '#') {
+                logo_bitmap[(y * 33) + x] = black_pixel;
+            }
+        }
+    }
+    write_logo_bitmap(187, 111, 33, 42);
+}
+
+void set_status_symbol() {
+    /* One centered black-and-white output panel spanning the full middle row. */
+    print_filled_screen_area(11, 105, 216, 55, get_menu_bg_color());
+    print_classic_macintosh_icon();
+    print_transport_icons(status_state);
+
+    for (uint8_t profile = 0; profile < 5; profile++) {
+        print_profile_button(profile, status_state.active_profile_index == profile);
+    }
 }
 
 void output_status_update_cb(struct output_status_state state) {
+    struct output_status_state previous = status_state;
     status_state = state;
     if (status_widget_initialized) {
-        set_status_symbol();
+        if (previous.selected_endpoint.transport != state.selected_endpoint.transport ||
+            previous.usb_is_hid_ready != state.usb_is_hid_ready) {
+            print_transport_icons(state);
+        }
+
+        if (previous.active_profile_index != state.active_profile_index) {
+            if (previous.active_profile_index >= 0 && previous.active_profile_index <= 4) {
+                print_profile_button(previous.active_profile_index, false);
+            }
+            if (state.active_profile_index >= 0 && state.active_profile_index <= 4) {
+                print_profile_button(state.active_profile_index, true);
+            }
+        }
     }
 }
 
@@ -230,25 +340,12 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_ble_active_profile_changed);
 ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 
 void zmk_widget_output_status_init() {
-    uint16_t bitmap_size_symbol = (symbol_width * symbol_scale) * (symbol_height * symbol_scale);
+    /* Two original 9 x 15 transport glyphs rendered at 2x. */
+    scaled_bitmap_symbol =
+        k_malloc((symbol_width * symbol_scale) * (symbol_height * symbol_scale) * sizeof(uint16_t));
 
-    scaled_bitmap_symbol = k_malloc(bitmap_size_symbol * 2 * sizeof(uint16_t));
-
-    uint16_t bitmap_size_bt_num = (bt_num_width * bt_num_scale) * (bt_num_height * bt_num_scale);
-
-    scaled_bitmap_bt_num = k_malloc(bitmap_size_bt_num * 2 * sizeof(uint16_t));
-
-    uint16_t bitmap_size_status = (status_width * status_scale) * (status_height * status_scale);
-
-    scaled_bitmap_status = k_malloc(bitmap_size_status * 2 * sizeof(uint16_t));
-
-    connectivity_slot_side = get_slot_to_print(INFO_SLOT_CONNECTIVITY);
-    if (connectivity_slot_side == SLOT_SIDE_RIGHT) {
-        bluetooth_profiles_x += 120;
-        bluetooth_status_x += 120;
-        symbol_usb_x += 120;
-        symbol_ble_x += 120;
-    }
+    /* One 7 x 9 layer-style glyph at factor 2 expands to 15 x 19 pixels. */
+    scaled_bitmap_bt_num = k_malloc((7 * 2 + 1) * (9 * 2 + 1) * sizeof(uint16_t));
 
     widget_output_status_init();
 }
