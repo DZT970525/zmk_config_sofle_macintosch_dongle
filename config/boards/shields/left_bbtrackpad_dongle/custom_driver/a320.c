@@ -47,7 +47,6 @@ static struct k_work_q a320_workq;
 #define SCROLL_Y_DIR CONFIG_A320_SCROLL_Y_DIR
 
 // --- 滚轮灵敏度与粒度配置 ---
-#define SCROLL_DEADZONE CONFIG_A320_SCROLL_DEADZONE
 #define SCROLL_INPUT_MAX CONFIG_A320_SCROLL_INPUT_MAX
 #define SCROLL_DIVISOR_SLOW CONFIG_A320_SCROLL_DIVISOR_SLOW
 #define SCROLL_DIVISOR_FAST CONFIG_A320_SCROLL_DIVISOR_FAST
@@ -74,8 +73,9 @@ static struct k_work_q a320_workq;
 #define MOTION_GPIO_FLAGS (GPIO_ACTIVE_LOW | GPIO_PULL_UP)
 
 /* ========= A320 常量 ========= */
-#define A320_I2C_ADDR 0x3B
-#define A320_PACKET_LEN 3
+#define A320_I2C_ADDR_3B 0x3B
+#define A320_I2C_ADDR_37 0x37
+#define A320_DEFAULT_I2C_ADDR A320_I2C_ADDR_37
 
 #define SLOW_KEY_MULTIPLIER 0.5f
 #define TOUCH_IDLE_TIMEOUT 50 // 30~80ms 看手感
@@ -86,7 +86,6 @@ static uint32_t last_activity_time = 0;
 static bool scroll_key_pressed = false;
 static bool arrow_key_pressed = false;
 static bool slow_key_pressed = false;
-static bool last_scroll_key_pressed = false; // ★ NEW
 static bool last_arrow_key_pressed = false;
 uint32_t last_packet_time = 0;
 static bool touched = false;
@@ -119,7 +118,7 @@ static int special_key_listener_cb(const zmk_event_t *eh) {
     }
 
     // Scroll key (Space)
-    if (ev->position == 61 || ev->position == 62) {
+    if (ev->position == 62) {
         scroll_key_pressed = ev->state;
         LOG_INF("space position=49 %s", scroll_key_pressed ? "PRESSED" : "RELEASED");
     }
@@ -140,81 +139,122 @@ struct a320_config {
     struct gpio_dt_spec motion_gpio;
 };
 
+typedef int (*a320_read_packet_fn_t)(const struct device *dev, int8_t *dx, int8_t *dy);
+
 struct a320_data {
     const struct device *dev;
+    struct i2c_dt_spec i2c;
+    a320_read_packet_fn_t read_packet;
+    uint8_t detected_i2c_addr;
     struct k_work work;
     struct gpio_callback motion_cb_data;
     struct k_work_delayable enable_irq_work; // ⭐ 新增
     uint32_t last_packet_time;
-    int16_t scroll_residue_x;
-    int16_t scroll_residue_y;
+    uint32_t last_scroll_time;
+    bool last_scroll_mode;
+    float scroll_residue_x;
+    float scroll_residue_y;
     int16_t arrow_residue_x;
     int16_t arrow_residue_y;
 };
 
-/* ========= I2C 读取（加锁版） ========= */
-static int a320_read_packet(const struct device *dev, int8_t *dx, int8_t *dy) {
-    const struct a320_config *cfg = dev->config;
-    uint8_t buf[A320_PACKET_LEN] = {0};
-    uint8_t reg = 0x82;
-
-    int ret;
-
+/* Read the selected variant's registers, always releasing the I2C mutex. */
+static int a320_read_registers(const struct device *dev, uint8_t reg, uint8_t *buf, size_t len) {
+    struct a320_data *data = dev->data;
     k_mutex_lock(&a320_i2c_mutex, K_FOREVER);
-
-    if (i2c_write_dt(&cfg->i2c, &reg, 1) < 0)
+    int ret = i2c_write_dt(&data->i2c, &reg, 1);
+    if (ret < 0)
         goto out;
-
-    if (i2c_burst_read_dt(&cfg->i2c, 0x82, buf, sizeof(buf)) < 0)
-        goto out;
-
-    *dx = (int8_t)buf[1];
-    *dy = -(int8_t)buf[2];
-
-    return 0;
-
+    ret = i2c_burst_read_dt(&data->i2c, reg, buf, len);
 out:
     k_mutex_unlock(&a320_i2c_mutex);
     return ret;
 }
 
-/* ========= ★ 抽象复用：滚轮单轴处理函数 ========= */
-static inline void process_scroll_axis(const struct device *dev, int8_t delta, int16_t *residue,
-                                       uint16_t input_code, int8_t dir_mult) {
-    int abs_delta = abs(delta);
-
-    // ★ 不清零，保持连续性
-    if (abs_delta <= SCROLL_DEADZONE) {
-        return;
-    }
-
-    if (abs_delta > SCROLL_INPUT_MAX) {
-        abs_delta = SCROLL_INPUT_MAX;
-    }
-
-    // ★ 非线性 divisor（更丝滑）
-    float t = (float)abs_delta / SCROLL_INPUT_MAX;
-    t = t * t;
-
-    float f_div = SCROLL_DIVISOR_SLOW - (SCROLL_DIVISOR_SLOW - SCROLL_DIVISOR_FAST) * t;
-
-    int divisor = (int)f_div;
-    if (divisor < 1)
-        divisor = 1;
-
-    *residue += (delta * dir_mult);
-
-    int16_t scroll_ticks = *residue / divisor;
-    if (scroll_ticks != 0) {
-        input_report_rel(dev, input_code, scroll_ticks, true, K_NO_WAIT);
-        *residue %= divisor;
-    }
-
-    // ★ 阻尼（关键）
-    *residue = (*residue * 3) / 4;
+/* Keep the original 0x3B dx/dy orientation. */
+static int a320_read_packet_3b(const struct device *dev, int8_t *dx, int8_t *dy) {
+    uint8_t buf[3] = {0};
+    int ret = a320_read_registers(dev, 0x82, buf, sizeof(buf));
+    if (ret < 0)
+        return ret;
+    *dx = (int8_t)buf[1];
+    *dy = -(int8_t)buf[2];
+    return 0;
 }
 
-static inline void process_arrow_axis(const struct device *dev, int8_t delta, int16_t *residue,
+/* The 0x37 variant has a different packet layout. */
+static int a320_read_packet_37(const struct device *dev, int8_t *dx, int8_t *dy) {
+    uint8_t buf[7] = {0};
+    int ret = a320_read_registers(dev, 0x0A, buf, sizeof(buf));
+    if (ret < 0)
+        return ret;
+    *dy = -(int8_t)buf[1];
+    *dx = -(int8_t)buf[3];
+    return 0;
+}
+
+static void a320_detect_variant(const struct device *dev) {
+    struct a320_data *data = dev->data;
+    const uint8_t candidates[] = {A320_I2C_ADDR_3B, A320_I2C_ADDR_37};
+    uint8_t test_byte = 0;
+    uint8_t found_addr = 0;
+
+    for (size_t i = 0; i < ARRAY_SIZE(candidates); i++) {
+        data->i2c.addr = candidates[i];
+        if (i2c_read_dt(&data->i2c, &test_byte, 1) == 0) {
+            found_addr = candidates[i];
+            break;
+        }
+    }
+
+    if (found_addr == 0) {
+        found_addr = A320_DEFAULT_I2C_ADDR;
+        LOG_WRN("Trackpad I2C not detected, fallback to 0x%02X", found_addr);
+    } else {
+        LOG_INF("Trackpad detected at I2C address 0x%02X", found_addr);
+    }
+
+    data->i2c.addr = found_addr;
+    data->detected_i2c_addr = found_addr;
+    data->read_packet =
+        (found_addr == A320_I2C_ADDR_3B) ? a320_read_packet_3b : a320_read_packet_37;
+}
+
+/* Same speed scaling and fractional accumulation as the Q20 CM5 driver. */
+static inline void process_cm5_scroll(const struct device *dev, struct a320_data *data,
+                                      int16_t dx, int16_t dy, uint32_t now) {
+    if (now - data->last_scroll_time > 60) {
+        data->scroll_residue_x = 0.0f;
+        data->scroll_residue_y = 0.0f;
+    }
+    data->last_scroll_time = now;
+
+    float speed = sqrtf((float)dx * dx + (float)dy * dy);
+    float scale;
+    if (speed > 80.0f)
+        scale = 0.05f;
+    else if (speed > 40.0f)
+        scale = 0.04f;
+    else if (speed > 20.0f)
+        scale = 0.03f;
+    else if (speed > 5.0f)
+        scale = 0.02f;
+    else
+        scale = 0.015f;
+
+    data->scroll_residue_x += dx * scale;
+    data->scroll_residue_y += dy * scale;
+    int16_t out_x = (int16_t)data->scroll_residue_x;
+    int16_t out_y = (int16_t)data->scroll_residue_y;
+    data->scroll_residue_x -= out_x;
+    data->scroll_residue_y -= out_y;
+    if (out_x || out_y) {
+        input_report_rel(dev, INPUT_REL_HWHEEL, -out_x, false, K_FOREVER);
+        input_report_rel(dev, INPUT_REL_WHEEL, -out_y, true, K_FOREVER);
+    }
+}
+
+static inline void process_arrow_axis(const struct device *dev, int16_t delta, int16_t *residue,
                                       uint16_t key_neg, uint16_t key_pos) {
 
     int abs_delta = abs(delta);
@@ -263,39 +303,40 @@ static void a320_work_cb(struct k_work *work) {
     if (now - last_activity_time > A320_WDT_TIMEOUT) {
         LOG_WRN("A320 watchdog recovery");
 
-        data->scroll_residue_x = 0;
-        data->scroll_residue_y = 0;
+        data->scroll_residue_x = 0.0f;
+        data->scroll_residue_y = 0.0f;
+        data->last_scroll_time = 0;
+        data->last_scroll_mode = false;
         data->arrow_residue_x = 0;
         data->arrow_residue_y = 0;
 
-        last_scroll_key_pressed = scroll_key_pressed;
         last_arrow_key_pressed = arrow_key_pressed;
 
         touched = false;
         return;
     }
 
-    int8_t dx = 0, dy = 0;
+    int8_t packet_dx = 0, packet_dy = 0;
 
     /* ========= ⭐ NEW: DRAIN MODE ========= */
-    int8_t total_dx = 0;
-    int8_t total_dy = 0;
+    int16_t total_dx = 0;
+    int16_t total_dy = 0;
     bool got_data = false;
 
     while (1) {
-        int ret = a320_read_packet(dev, &dx, &dy);
+        int ret = data->read_packet(dev, &packet_dx, &packet_dy);
 
         if (ret != 0) {
             break;
         }
 
         /* 防止异常空包 */
-        if (dx == 0 && dy == 0) {
+        if (packet_dx == 0 && packet_dy == 0) {
             break;
         }
 
-        total_dx += dx;
-        total_dy += dy;
+        total_dx += packet_dx;
+        total_dy += packet_dy;
         got_data = true;
     }
 
@@ -315,13 +356,19 @@ static void a320_work_cb(struct k_work *work) {
         return;
     }
 
-    dx = total_dx;
-    dy = total_dy;
+    int16_t dx = total_dx;
+    int16_t dy = total_dy;
 
     /* ========= scroll / arrow mode 切换检测 ========= */
-    bool just_enter_scroll = scroll_key_pressed && !last_scroll_key_pressed;
     bool just_enter_arrow = arrow_key_pressed && !last_arrow_key_pressed;
     bool capslock = current_indicators & HID_INDICATORS_CAPS_LOCK;
+    bool scroll_mode = scroll_key_pressed || capslock;
+
+    if (scroll_mode && !data->last_scroll_mode) {
+        data->scroll_residue_x = 0.0f;
+        data->scroll_residue_y = 0.0f;
+        data->last_scroll_time = 0;
+    }
 
     if (arrow_key_pressed) {
 
@@ -345,28 +392,11 @@ static void a320_work_cb(struct k_work *work) {
         process_arrow_axis(dev, dx, &data->arrow_residue_x, INPUT_BTN_1, INPUT_BTN_0);
 
         process_arrow_axis(dev, dy, &data->arrow_residue_y, INPUT_BTN_3, INPUT_BTN_2);
-    } else if (scroll_key_pressed || capslock) {
-
-        if (just_enter_scroll) {
-            data->scroll_residue_x = dx * SCROLL_X_DIR;
-            data->scroll_residue_y = dy * SCROLL_Y_DIR;
-        }
-
-        int abs_dx = abs(dx);
-        int abs_dy = abs(dy);
-
-        if (abs_dy * DOMINANT_DENOMINATOR > abs_dx * DOMINANT_NUMERATOR) {
-            dx = 0;
-        } else if (abs_dx * DOMINANT_DENOMINATOR > abs_dy * DOMINANT_NUMERATOR) {
-            dy = 0;
-        } else {
-            dx = 0;
-            dy = 0;
-        }
-
-        process_scroll_axis(dev, -1 * dx, &data->scroll_residue_x, INPUT_REL_HWHEEL, SCROLL_X_DIR);
-
-        process_scroll_axis(dev, -1 * dy, &data->scroll_residue_y, INPUT_REL_WHEEL, SCROLL_Y_DIR);
+    } else if (scroll_mode) {
+        /* Keep this board's original X/Y axes and scroll directions. */
+        int16_t scroll_x = dx * SCROLL_X_DIR;
+        int16_t scroll_y = dy * SCROLL_Y_DIR;
+        process_cm5_scroll(dev, data, scroll_x, scroll_y, now);
     } else if (!capslock) {
 
         uint8_t a320_led_brt = indicator_tp_get_last_valid_brightness();
@@ -383,7 +413,7 @@ static void a320_work_cb(struct k_work *work) {
         touched = false;
     }
 
-    last_scroll_key_pressed = scroll_key_pressed;
+    data->last_scroll_mode = scroll_mode && !arrow_key_pressed;
     last_arrow_key_pressed = arrow_key_pressed;
     touched = false;
     data->last_packet_time = now;
@@ -394,9 +424,27 @@ static void motion_isr(const struct device *port, struct gpio_callback *cb, uint
     struct a320_data *data = CONTAINER_OF(cb, struct a320_data, motion_cb_data);
 
     last_activity_time = k_uptime_get_32();
+    indicator_tp_motion_triggered();
 
     /* ⭐ 防止 work 堆积 */
     k_work_submit_to_queue(&a320_workq, &data->work);
+}
+
+/* An edge interrupt will not fire when MOTION is already active at startup. */
+static void a320_process_pending_motion(struct a320_data *data) {
+    const struct a320_config *cfg = data->dev->config;
+    int active = gpio_pin_get_dt(&cfg->motion_gpio);
+
+    if (active < 0) {
+        LOG_WRN("Failed to read A320 MOTION pin: %d", active);
+        return;
+    }
+
+    if (active) {
+        last_activity_time = k_uptime_get_32();
+        indicator_tp_motion_triggered();
+        k_work_submit_to_queue(&a320_workq, &data->work);
+    }
 }
 
 bool tp_is_touched(void) { return touched; }
@@ -408,6 +456,7 @@ static void a320_enable_irq_work_cb(struct k_work *work) {
     const struct a320_config *cfg = dev->config;
 
     gpio_pin_interrupt_configure_dt(&cfg->motion_gpio, GPIO_INT_EDGE_TO_ACTIVE);
+    a320_process_pending_motion(data);
 
     LOG_INF("A320 IRQ enabled (delayed)");
 }
@@ -425,6 +474,8 @@ static int a320_init(const struct device *dev) {
     k_mutex_init(&a320_i2c_mutex);
 
     data->dev = dev;
+    data->i2c = cfg->i2c;
+    a320_detect_variant(dev);
 
     k_work_init(&data->work, a320_work_cb);
 
@@ -438,11 +489,13 @@ static int a320_init(const struct device *dev) {
     gpio_add_callback(cfg->motion_gpio.port, &data->motion_cb_data);
 
     gpio_pin_interrupt_configure_dt(&cfg->motion_gpio, GPIO_INT_EDGE_TO_ACTIVE);
+    a320_process_pending_motion(data);
 
     k_work_init_delayable(&data->enable_irq_work, a320_enable_irq_work_cb);
     k_work_schedule(&data->enable_irq_work, K_MSEC(200));
 
-    LOG_INF("A320 Driver Initialized (I2C mutex enabled)");
+    LOG_INF("A320 Driver Initialized (addr=0x%02X, I2C mutex enabled)",
+            data->detected_i2c_addr);
     return 0;
 }
 
