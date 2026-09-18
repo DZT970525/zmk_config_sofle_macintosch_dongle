@@ -20,7 +20,7 @@
     custom_led: pwmledto{
         compatible = "pwm-leds";
         pwm_led_0 {
-            pwms = <&pwm2 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+            pwms = <&pwm3 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
         };
     };
 };
@@ -32,10 +32,10 @@
     pinctrl-names = "default", "sleep";
 };
 
-&pwm2 {
+&pwm3 {
     status = "okay";
-    pinctrl-0 = <&pwm2_default>;
-    pinctrl-1 = <&pwm2_sleep>;
+    pinctrl-0 = <&pwm3_default>;
+    pinctrl-1 = <&pwm3_sleep>;
     pinctrl-names = "default", "sleep";
 };
 
@@ -98,13 +98,13 @@
         };
     };
 
-    pwm2_default:pwm2_default{
+    pwm3_default:pwm3_default{
         group1{
             psels = <NRF_PSEL(PWM_OUT0, 0, 16)>; // GPIO for custom led
         };
     };
 
-    pwm2_sleep: pwm2_sleep {
+    pwm3_sleep: pwm3_sleep {
         group1 {
             psels = <NRF_PSEL(PWM_OUT0, 0, 16)>;
             bias-pull-down;
@@ -126,5 +126,4 @@
         };
     };
 };
-
 
