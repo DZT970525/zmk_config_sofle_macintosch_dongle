@@ -18,6 +18,9 @@ extern "C" {
  */
 uint8_t indicator_tp_get_last_valid_brightness(void);
 
+/* Safe to call from the A320 MOTION GPIO ISR. */
+void indicator_tp_motion_triggered(void);
+
 #ifdef __cplusplus
 }
 #endif
